@@ -275,7 +275,7 @@ body:has(#page-legacy-feedback.active) .col-main { background:var(--bg)!importan
   border-radius:999px;
 }
 #page-legacy-org .org-table {
-  min-width:1480px;
+  min-width:1380px;
   table-layout:fixed;
 }
 #page-legacy-org .org-table th,
