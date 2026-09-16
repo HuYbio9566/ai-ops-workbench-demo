@@ -1,0 +1,2372 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="data:,">
+<script src="./personalization-state.js?v=20260911-3"></script>
+<title>数字人运营平台 · 业务开放版原型 v3</title>
+<script src="./chart.umd.min.js"></script>
+
+<style>
+:root{
+  --bg:#f5f7fb; --surface:#ffffff; --surface-soft:#f8fafc; --table-header-bg:#f1f5f9;
+  --border:#e7ebf2; --border-strong:#d3dae6;
+  --text:#0f1c33; --muted:#57647c; --faint:#93a0b4;
+  --blue:#1f5fe8; --blue-deep:#174fd1; --blue-soft:#e9effd;
+  --green:#0e8f58; --bad:#c93030; --amber:#c77d0a;
+  --new:#7c3aed; --new-soft:#f1ebfd;
+  --grad:linear-gradient(135deg,#1f5fe8 0%,#7c3aed 100%);
+  --grad-deep:linear-gradient(135deg,#174fd1 0%,#682fd4 100%);
+  --shadow:0 1px 2px rgba(15,28,51,.04),0 6px 20px rgba(15,28,51,.06),0 18px 44px -14px rgba(15,28,51,.10);
+  --shadow-soft:0 1px 2px rgba(15,28,51,.03),0 3px 12px rgba(15,28,51,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:linear-gradient(180deg,#f8fafd 0%,var(--bg) 240px);background-attachment:fixed;color:var(--text);font-family:Inter,"PingFang SC","Microsoft YaHei",system-ui,sans-serif;font-size:15px;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+.wrap{display:grid;grid-template-columns:236px 1fr;gap:14px;height:100vh;padding:14px;overflow:hidden}
+.col-left{display:flex;flex-direction:column;gap:12px;height:100%;overflow-y:auto}
+.col-main{height:100%;overflow-y:auto;padding-right:4px}
+.main-shell{min-height:100%;background:#fff;padding:12px}
+
+/* 品牌 */
+.brand{height:36px;display:flex;align-items:center;gap:10px;padding:0 12px;background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow-soft)}
+.logo{width:32px;height:32px;border:0;border-radius:0;background:transparent;color:inherit;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;flex:none;box-shadow:none}
+.logo img{display:block;width:28px;height:28px;object-fit:contain;border-radius:0}
+.brand b{display:block;font-size:18px;letter-spacing:-0.01em}
+.brand span{display:block;font-size:13px;color:var(--muted)}
+.badge{display:inline-block;margin-left:8px;font-size:11px;padding:2px 8px;border-radius:20px;background:var(--blue-soft);color:var(--blue);font-weight:700;vertical-align:2px}
+.badge.new{background:var(--new-soft);color:var(--new)}
+
+/* 当前用户条 */
+.user-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:12px 16px;box-shadow:var(--shadow-soft)}
+.user-box .lb{font-size:12px;color:var(--muted);letter-spacing:.06em;margin-bottom:6px;font-weight:700}
+.user-line{display:flex;align-items:center;gap:8px}
+.u-avatar{width:30px;height:30px;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex:none}
+.u-name{font-weight:700;font-size:14px}
+.u-role{font-size:11px;color:var(--muted)}
+.btn{display:inline-flex;align-items:center;justify-content:center;padding:7px 14px;border:1px solid var(--border-strong);border-radius:9px;background:var(--surface);color:var(--text);font-family:inherit;font-size:13px;cursor:pointer;transition:.15s;gap:6px;box-shadow:0 1px 2px rgba(15,28,51,.03)}
+.btn:hover{border-color:var(--blue);color:var(--blue);box-shadow:0 2px 6px rgba(31,95,232,.10)}
+.btn.primary{background:var(--grad);border-color:transparent;color:#fff;box-shadow:0 2px 8px rgba(31,95,232,.28)}
+.btn.primary:hover{background:var(--grad-deep);color:#fff;box-shadow:0 4px 14px rgba(31,95,232,.35);transform:translateY(-1px)}
+.btn.primary > svg,.btn.newbtn > svg{width:14px;height:14px;stroke-width:2;flex:none}
+.btn.sm{padding:4px 10px;font-size:12px}
+.btn.ghost{border-style:dashed}
+.btn.newbtn{background:var(--new);border-color:var(--new);color:#fff;box-shadow:0 2px 8px rgba(124,58,237,.25)}
+.btn.newbtn:hover{background:#682fd4;color:#fff;box-shadow:0 4px 14px rgba(124,58,237,.32);transform:translateY(-1px)}
+.seg{display:inline-flex;border:1px solid var(--border-strong);border-radius:8px;overflow:hidden}
+.seg .seg-btn{padding:6px 14px;border:none;background:var(--surface);color:var(--muted);font-size:13px;cursor:pointer;border-right:1px solid var(--border-strong)}
+.seg .seg-btn:last-child{border-right:none}
+.seg .seg-btn.active{background:var(--blue);color:#fff;font-weight:600}
+
+/* 导航 */
+.nav-panel{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:8px;box-shadow:var(--shadow-soft)}
+.nav-sec{font-size:12px;font-weight:700;letter-spacing:.08em;color:var(--muted);margin:12px 0 6px;padding:0 12px;display:flex;align-items:center;justify-content:space-between}
+.nav-sec .old-tag{font-size:10px;color:var(--faint);font-weight:400}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border:1px solid transparent;border-radius:10px;cursor:pointer;font-family:inherit;color:var(--text);font-size:14px;transition:.15s;width:100%;text-align:left;background:transparent;position:relative}
+.nav-item:hover{border-color:var(--blue);background:var(--surface-soft)}
+.nav-item.active{background:var(--blue-soft);border-color:var(--blue);color:var(--blue);font-weight:700;box-shadow:inset 0 0 0 1px rgba(31,95,232,.12)}
+.nav-item.active::before{content:'';position:absolute;left:-1px;top:8px;bottom:8px;width:3px;border-radius:3px;background:var(--grad)}
+.nav-item .dot{width:8px;height:8px;border-radius:50%;background:var(--border-strong);flex:none}
+.nav-item.active .dot{background:var(--blue)}
+.nav-item.new-item{color:var(--new)}
+.nav-item.new-item .dot{background:var(--new-soft);border:1.5px solid var(--new)}
+.nav-item.new-item.active{background:var(--new-soft);border-color:var(--new);color:var(--new)}
+.nav-item.new-item.active .dot{background:var(--new)}
+.nav-item.hidden{display:none}
+
+/* 顶部条 */
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:12px}
+.topbar .crumbs{font-size:13px;color:var(--muted)}
+.pill{font-size:11px;padding:2px 10px;border-radius:20px;font-weight:700}
+.pill.on{background:var(--blue-soft);color:var(--blue)}
+.pill.warn{background:#fdf1e0;color:var(--amber)}
+.pill.new{background:var(--new-soft);color:var(--new)}
+
+/* 卡片 */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:var(--shadow-soft);margin-bottom:14px}
+.card-title{display:flex;justify-content:space-between;align-items:center;font-size:16px;font-weight:700;margin-bottom:12px}
+.bot-config-title{display:block;margin-bottom:12px}
+.bot-config-toolbar{display:flex;align-items:center;gap:16px;margin-bottom:16px}
+.bot-config-filters{display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0}
+.bot-config-filters input{flex:0 0 240px;width:240px;min-width:240px}
+.bot-config-actions{display:flex;align-items:center;justify-content:flex-end;margin-left:auto;flex:none}
+.org-actions{display:flex;gap:16px;align-items:center;margin-left:auto}
+.org-toolbar{display:flex;justify-content:space-between;gap:16px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
+.org-filters{display:flex;justify-content:flex-start;gap:8px;flex-wrap:wrap;align-items:center}
+.modal.org-batch-modal{width:480px !important;height:360px;max-height:360px;max-width:calc(100vw - 24px);box-sizing:border-box}
+.card-title .hint{font-size:12px;color:var(--faint);font-weight:400}
+.grid{display:grid;gap:14px}
+.grid-4{grid-template-columns:repeat(4,1fr)}
+.grid-2{grid-template-columns:repeat(2,1fr)}
+.grid-3{grid-template-columns:repeat(3,1fr)}
+.grid-5{grid-template-columns:repeat(5,1fr)}
+@media(max-width:1200px){.grid-4{grid-template-columns:repeat(2,1fr)}.grid-3{grid-template-columns:repeat(2,1fr)}.grid-5{grid-template-columns:repeat(3,1fr)}}
+
+/* KPI */
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:var(--shadow-soft);cursor:pointer;transition:.18s}
+.kpi:hover{border-color:var(--blue);transform:translateY(-2px);box-shadow:var(--shadow)}
+.kpi .k-label{font-size:13px;color:var(--muted)}
+.kpi .k-value{font-size:28px;font-weight:800;margin:6px 0 2px;letter-spacing:-0.02em;font-variant-numeric:tabular-nums}
+.kpi .k-sub{font-size:12px;color:var(--faint)}
+/* 信息提示图标：解释性语句收进小图标，悬停显示 tooltip */
+.info-ic{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:50%;background:#c3ccdb;color:#fff;font-size:10px;font-weight:800;cursor:help;position:relative;margin-left:5px;vertical-align:1.5px;flex:none;font-family:inherit;line-height:1}
+.info-ic:hover{background:var(--blue)}
+.info-ic:hover::after{content:attr(data-tip);position:absolute;left:50%;bottom:calc(100% + 7px);transform:translateX(-50%);background:#101c33;color:#fff;font-size:12px;font-weight:400;line-height:1.55;padding:7px 11px;border-radius:8px;width:max-content;max-width:min(340px,calc(100vw - 48px));white-space:normal;overflow-wrap:break-word;z-index:60;box-shadow:0 6px 20px rgba(15,28,51,.28);text-align:left}
+.info-ic:hover::before{content:'';position:absolute;left:50%;bottom:calc(100% + 3px);transform:translateX(-50%);border:5px solid transparent;border-top-color:#101c33;z-index:60}
+/* 长文本 tooltip（如知识回流）：从图标左边缘向右展开，避免居中时左侧溢出被裁 */
+.info-ic.tip-left:hover::after{left:0;transform:none}
+.info-ic.tip-left:hover::before{left:14px;transform:none}
+.k-value.blue{color:var(--blue)} .k-value.green{color:var(--green)} .k-value.bad{color:var(--bad)} .k-value.amber{color:var(--amber)} .k-value.purple{color:#7c3aed}
+/* 核心 KPI 面板（重点层）：浅蓝渐变底，与次级白卡形成主次对比 */
+.kpi-panel .kpi{background:linear-gradient(180deg,#f6f8ff 0%,#edf1fb 100%);border-color:#dbe3f4}
+.kpi-panel .kpi:hover{border-color:var(--blue)}
+.kpi-panel .k-value{font-size:30px}
+
+/* 数字人选择 */
+.bot-bar{background:linear-gradient(135deg,#1b3f9c 0%,#3d2d8f 55%,#5b2a8f 100%);border:none;box-shadow:0 8px 24px rgba(31,60,160,.28)}
+.bot-bar .bot-tab{background:rgba(255,255,255,.13);border-color:rgba(255,255,255,.26);color:#fff}
+.bot-bar .bot-tab:hover{border-color:#fff;background:rgba(255,255,255,.22)}
+.bot-bar .bot-tab.active{background:#fff;border-color:#fff;color:var(--new);box-shadow:0 4px 14px rgba(0,0,0,.18)}
+.bot-bar .bot-tab .st{color:rgba(255,255,255,.78)}
+.bot-bar .bot-tab.active .st{color:var(--faint)}
+.bot-tabs{display:flex;gap:8px;flex-wrap:wrap}
+.bot-tab{padding:8px 18px;border:1px solid var(--border);border-radius:10px;background:var(--surface);cursor:pointer;font-family:inherit;font-size:14px;color:var(--text);transition:.12s;display:flex;align-items:center;gap:8px}
+.bot-tab:hover{border-color:var(--blue)}
+.bot-tab.active{background:var(--new-soft);border-color:var(--new);color:var(--new);font-weight:700}
+.bot-tab .st{font-size:10px;color:var(--faint);font-weight:400}
+.bot-tab.active .st{color:var(--new)}
+.bot-tab.disabled{opacity:.5;cursor:not-allowed}
+
+/* 页内 Tab */
+.inner-tabs{display:flex;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:5px;box-shadow:0 2px 12px rgba(15,28,51,.08);margin-bottom:14px;width:fit-content}
+.inner-tab{padding:10px 24px;border:none;border-radius:10px;background:transparent;cursor:pointer;font-family:inherit;font-size:15px;font-weight:600;color:var(--muted);transition:.15s;display:flex;align-items:center;gap:7px}
+.inner-tab:hover{color:var(--blue);background:var(--blue-soft)}
+.inner-tab.active{background:var(--grad);color:#fff;font-weight:700;box-shadow:0 3px 10px rgba(31,95,232,.3)}
+
+/* bot 卡片（总览） */
+.bot-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:var(--shadow-soft);cursor:pointer;transition:.18s;position:relative}
+.bot-card:hover{border-color:var(--blue);transform:translateY(-2px);box-shadow:var(--shadow)}
+.bot-card.active{border-color:var(--blue);background:var(--blue-soft)}
+.bot-card .b-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.bot-ico{width:38px;height:38px;border-radius:10px;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;flex:none}
+.bot-card .b-name{font-weight:700;font-size:15px}
+.bot-card .b-status{font-size:11px;color:var(--green)}
+.bot-card .b-row{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-top:4px}
+.bot-card .b-row b{color:var(--text)}
+.tag{font-size:11px;padding:2px 8px;border-radius:20px;background:var(--surface-soft);border:1px solid var(--border);color:var(--muted)}
+.tag.blue{background:var(--blue-soft);color:var(--blue);border-color:transparent}
+.tag.green{background:#e6f6ee;color:var(--green);border-color:transparent}
+.tag.warn{background:#fdf1e0;color:var(--amber);border-color:transparent}
+
+/* 表格 */
+table{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
+th{text-align:left;padding:9px 10px;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border);white-space:nowrap;background:var(--table-header-bg,var(--surface-soft))}
+td{padding:9px 10px;border-bottom:1px solid var(--border)}
+tr:hover td{background:var(--surface-soft)}
+.lib-selected{background:var(--blue-soft)!important}
+.lib-selected td{background:var(--blue-soft)!important}
+.mono{font-family:ui-monospace,Consolas,monospace}
+
+/* 控件 */
+select,input[type=text]{padding:7px 10px;border:1px solid var(--border-strong);border-radius:8px;font-family:inherit;font-size:13px;background:var(--surface);color:var(--text)}
+.chart-box{position:relative;height:280px}
+.chart-box.h220{height:220px}
+.chart-box canvas{max-width:100%!important}
+/* 总览页图表卡：等高 + 图表填满，避免与列表卡并排时下方留白 */
+#itab-bot-overview .grid-2 > .card{display:flex;flex-direction:column}
+#itab-bot-overview .grid-2 > .card .chart-box{flex:1;height:auto;min-height:200px}
+.hint-text{font-size:12px;color:var(--faint);margin-top:6px}
+
+/* 弹窗 */
+.modal-mask{position:fixed;inset:0;background:rgba(15,30,56,.45);z-index:100;display:none;align-items:center;justify-content:center}
+.modal-mask.show{display:flex}
+.modal{background:var(--surface);border-radius:16px;width:640px;max-width:92vw;max-height:86vh;overflow-y:auto;box-shadow:0 8px 24px rgba(15,28,51,.12),0 28px 64px -12px rgba(15,28,51,.28)}
+.modal .m-head{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface)}
+.modal .m-body{padding:20px}
+.xbtn{border:none;background:none;font-size:20px;cursor:pointer;color:var(--muted);font-family:inherit}
+/* 滚动条 */
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-thumb{background:#c9d2e0;border-radius:8px;border:2px solid transparent;background-clip:content-box}
+::-webkit-scrollbar-thumb:hover{background:#aeb9cc;background-clip:content-box;border:2px solid transparent}
+::-webkit-scrollbar-track{background:transparent}
+.flow{display:flex;align-items:center;gap:10px;margin:12px 0}
+.flow .step{flex:1;text-align:center;border:1px solid var(--border);border-radius:10px;padding:10px;font-size:12px;color:var(--muted);background:var(--surface-soft)}
+.flow .step.done{border-color:var(--green);color:var(--green);background:#e6f6ee;font-weight:700}
+.flow .arrow{color:var(--faint)}
+.masked{color:var(--faint);background:repeating-linear-gradient(45deg,transparent,transparent 4px,var(--surface-soft) 4px,var(--surface-soft) 8px);border-radius:4px}
+
+.page{display:none}
+.page.active{display:block}
+.itab-page{display:none}
+.itab-page.active{display:block}
+.notice{border:1px dashed var(--blue);background:var(--blue-soft);border-radius:10px;padding:10px 14px;font-size:13px;color:var(--blue);margin-bottom:14px}
+.notice.amber{border-color:var(--amber);background:#fdf1e0;color:var(--amber)}
+.notice.new{border-color:var(--new);background:var(--new-soft);color:var(--new)}
+
+/* 老页面占位 */
+.legacy-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:40px;text-align:center;color:var(--muted);box-shadow:var(--shadow-soft)}
+.legacy-card .big{font-size:22px;font-weight:700;color:var(--text);margin-bottom:8px}
+</style>
+<style>
+/* 用户入口保持单行：头像 + 名称/下拉箭头 + 消息入口。 */
+.user-box { cursor:pointer; padding:10px 12px; }
+.user-box:focus-visible { outline:2px solid var(--blue); outline-offset:2px; }
+.user-line { min-height:32px; }
+.user-line > div:nth-child(2) { min-width:0; flex:1; }
+.u-name { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; display:flex; align-items:center; gap:8px; }
+.user-chevron { width:8px; height:8px; border-right:1.5px solid var(--muted); border-bottom:1.5px solid var(--muted); transform:rotate(45deg) translateY(-2px); flex:none; margin-right:2px; }
+.user-box:hover .user-chevron { border-color:var(--blue); }
+.user-message { position:relative; display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; flex:none; color:var(--muted); cursor:pointer; border-radius:var(--ui-control-radius); }
+.user-message svg { width:16px; height:16px; }
+.user-message:hover { color:var(--blue); }
+.user-message .unread-dot { position:absolute; top:1px; right:1px; width:6px; height:6px; border-radius:50%; background:#e5484d; border:1.5px solid var(--surface); }
+.u-role,.user-box .lb { display:none; }
+</style>
+<link rel="stylesheet" href="./ui-typography.css">
+<link rel="stylesheet" href="./workbench.css?v=20260916-table-header-token-1">
+<link rel="stylesheet" href="./personalization.css?v=20260916-table-header-token-1">
+<link rel="stylesheet" href="./personalization-factory.css?v=20260914-font-select-1">
+</head>
+<body>
+<div class="wrap">
+  <input class="mobile-nav-toggle" type="checkbox" id="mobileNavToggle" aria-label="展开或收起导航">
+  <label class="mobile-nav-label" for="mobileNavToggle">导航与账号 <span aria-hidden="true">⌄</span></label>
+  <!-- ======= 左侧栏（= 现有工作台导航 + 新增数字人运营平台入口） ======= -->
+  <div class="col-left">
+    <div class="brand">
+      <div class="logo"><img src="./brand-logo.png" alt="数 AI 运营工作台"></div>
+      <div><b>AI 运营工作台</b></div>
+    </div>
+
+    <div class="nav-panel">
+      <div class="nav-sec">运营驾驶舱</div>
+      <button class="nav-item legacy-item" data-page="legacy-overview" data-icon="Monitor"><span class="nav-icon" aria-hidden="true"></span>运营总览</button>
+
+      <div class="nav-sec">运营板块</div>
+      <button class="nav-item legacy-item" data-page="legacy-feedback" data-icon="ChatDotRound"><span class="nav-icon" aria-hidden="true"></span>内网反馈运营</button>
+      <button class="nav-item legacy-item" data-page="legacy-knowledge" data-icon="Collection"><span class="nav-icon" aria-hidden="true"></span>知识库运营</button>
+      <button class="nav-item legacy-item" data-page="legacy-tuitui" data-icon="ChatLineRound"><span class="nav-icon" aria-hidden="true"></span>推推运营</button>
+      <button class="nav-item legacy-item" data-page="legacy-skillhub" data-icon="Grid"><span class="nav-icon" aria-hidden="true"></span>SkillHub 运营</button>
+
+      <div class="nav-sec" style="margin-top:14px">业务运营平台</div>
+      <button class="nav-item new-item admin-item" data-page="bot-platform" data-entry="overview" data-icon="DataAnalysis"><span class="nav-icon" aria-hidden="true"></span>总览 <span class="tag blue" style="margin-left:auto">超管</span></button>
+      <button class="nav-item new-item biz-item" data-page="bot-platform" data-entry="it" data-icon="Cpu"><span class="nav-icon" aria-hidden="true"></span>IT业务</button>
+      <button class="nav-item new-item biz-item" data-page="bot-platform" data-entry="admin" data-icon="OfficeBuilding"><span class="nav-icon" aria-hidden="true"></span>行政业务</button>
+      <button class="nav-item new-item biz-item" data-page="bot-platform" data-entry="jingfen" data-icon="TrendCharts"><span class="nav-icon" aria-hidden="true"></span>经分业务</button>
+      <button class="nav-item new-item biz-item" data-page="bot-platform" data-entry="security" data-icon="Lock"><span class="nav-icon" aria-hidden="true"></span>安全终端业务</button>
+      <button class="nav-item new-item biz-item" data-page="bot-platform" data-entry="test" data-icon="Operation"><span class="nav-icon" aria-hidden="true"></span>测试业务 <span class="pill warn" style="margin-left:auto">2数字人</span></button>
+
+      <div class="nav-sec" style="margin-top:14px">视频板块</div>
+      <button class="nav-item legacy-item" data-page="legacy-video" data-icon="VideoCamera"><span class="nav-icon" aria-hidden="true"></span>视频案例</button>
+
+      <div class="nav-sec" style="margin-top:14px">后台管理</div>
+      <button class="nav-item legacy-item admin-item" data-page="legacy-org" data-icon="User"><span class="nav-icon" aria-hidden="true"></span>组织管理 <span class="pill new" style="margin-left:auto">权限+接入</span></button>
+      <button class="nav-item legacy-item admin-item" data-page="legacy-opslog" data-icon="Document"><span class="nav-icon" aria-hidden="true"></span>操作记录</button>
+    </div>
+
+    <div class="user-box" role="button" tabindex="0" aria-label="切换模拟用户" onclick="openUserModal()" onkeydown="if(event.key==='Enter'||event.key===' ')openUserModal()">
+      <div class="user-line">
+        <div class="u-avatar" id="uAvatar">演</div>
+        <div>
+          <div class="u-name" id="uName">演示用户01 <span class="user-chevron" aria-hidden="true"></span></div>
+        </div>
+        <span class="user-message" role="button" tabindex="0" aria-label="消息中心" title="消息中心" onclick="event.stopPropagation();openMessageCenter()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();event.stopPropagation();openMessageCenter()}">
+          <i data-lucide="bell" aria-hidden="true"></i><span class="unread-dot" aria-label="有未读消息"></span>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======= 主区 ======= -->
+  <div class="col-main">
+    <div class="main-shell">
+    <div class="bot-header-zone">
+    <div class="topbar">
+      <div class="crumbs" id="crumbs">数字人运营平台</div><span id="crumbBotTag" class="bot-status-tag" hidden></span>
+    </div>
+    <div class="page-context-switcher">
+      <div class="card bot-bar" style="padding:14px 16px">
+        <div class="bot-tabs" id="botTabs"></div>
+      </div>
+      <div class="inner-tabs" id="innerTabs">
+        <button class="inner-tab active" data-itab="bot-dash">📊 运营看板</button>
+        <button class="inner-tab" data-itab="bot-qa">🔄 问题记录与知识回流</button>
+        <button class="inner-tab" data-itab="bot-groups">💬 群聊与频道运营</button>
+        <button class="inner-tab" data-itab="bot-seaf">🔭 Seaf 运营观测 <span class="badge new" style="margin-left:4px">新增</span></button>
+      </div>
+    </div>
+    </div>
+
+    <!-- ══════════ 老页面占位（现有功能，不改动） ══════════ -->
+    <div class="page" id="page-legacy-overview">
+      <div class="legacy-card"><div class="construction-content"><img src="./construction-placeholder.png" width="160" height="160" alt="" class="construction-image"><div class="big">内容建设中</div><p>此页面为现有运营工作台功能，保持不变。原型仅演示「数字人运营平台」新增板块及其与现有平台的融合。</p></div></div>
+    </div>
+    <div class="page" id="page-legacy-feedback">
+      <div class="legacy-card"><div class="construction-content"><img src="./construction-placeholder.png" width="160" height="160" alt="" class="construction-image"><div class="big">内容建设中</div><p>内网反馈运营（现有功能）保持不变。进入「数字人运营平台」查看新增板块。</p></div></div>
+    </div>
+    <div class="page" id="page-legacy-knowledge">
+      <div class="legacy-card"><div class="construction-content"><img src="./construction-placeholder.png" width="160" height="160" alt="" class="construction-image"><div class="big">内容建设中</div><p>知识库运营（现有功能）保持不变。进入「数字人运营平台」查看新增板块。</p></div></div>
+    </div>
+    <div class="page" id="page-legacy-tuitui">
+      <div class="legacy-card"><div class="construction-content"><img src="./construction-placeholder.png" width="160" height="160" alt="" class="construction-image"><div class="big">内容建设中</div><p>推推运营（现有功能）保持不变。进入「数字人运营平台」查看新增板块。</p></div></div>
+    </div>
+    <div class="page" id="page-legacy-skillhub">
+      <div class="legacy-card"><div class="construction-content"><img src="./construction-placeholder.png" width="160" height="160" alt="" class="construction-image"><div class="big">内容建设中</div><p>SkillHub 运营（现有功能）保持不变。进入「数字人运营平台」查看新增板块。</p></div></div>
+    </div>
+    <div class="page" id="page-legacy-video">
+      <div class="legacy-card"><div class="construction-content"><img src="./construction-placeholder.png" width="160" height="160" alt="" class="construction-image"><div class="big">内容建设中</div><p>视频案例（现有功能）保持不变。进入「数字人运营平台」查看新增板块。</p></div></div>
+    </div>
+    <!-- ══════════ 组织管理（组织架构同步 + 角色权限；业务运营平台权限融入此处） ══════════ -->
+    <div class="page" id="page-legacy-org">
+      <div class="card">
+        <div class="card-title">组织架构与权限</div>
+        <div class="org-toolbar">
+          <span class="org-filters">
+            <input type="text" id="orgSearch" placeholder="搜索姓名、账号、部门…" style="flex:1;min-width:200px" oninput="renderOrg()">
+            <span class="org-dept-select-wrap"><select id="orgDeptFilter" onchange="renderOrg()"></select><i data-lucide="chevron-down" aria-hidden="true"></i></span>
+            <span class="org-dept-select-wrap"><select id="orgRoleFilter" onchange="renderOrg()">
+              <option value="">全部角色</option>
+              <option value="super_admin">超级管理员</option>
+              <option value="admin">管理员</option>
+              <option value="accessible">可访问</option>
+              <option value="user">普通用户</option>
+            </select><i data-lucide="chevron-down" aria-hidden="true"></i></span>
+          </span>
+          <span class="org-actions"><button class="btn sm" onclick="openGrantBatchModal()">批量授予</button><button class="btn primary sm" onclick="syncOrg()">同步组织架构</button></span>
+        </div>
+        <div class="org-table-scroll">
+        <table class="org-table">
+          <thead><tr>
+            <th style="width:48px"><input type="checkbox" id="orgSelAll" onchange="toggleOrgAll(this)"></th>
+            <th>姓名</th><th>账号</th><th>部门</th><th>部门路径</th><th>角色</th>
+            <th style="min-width:280px">业务运营平台权限（业务 → 数字人 → 功能模块）</th><th>操作</th>
+          </tr></thead>
+          <tbody id="orgTable"></tbody>
+        </table>
+        </div>
+        <div class="hint-text">组织架构从组织系统同步；角色 4 档：<b>普通用户</b> / <b>可访问</b> / <b>管理员</b> / <b>超级管理员</b>。业务运营平台权限已融入本页：点「设置权限」配置 ① 可访问业务 → ② 数字人 → ③ 功能模块（运营看板 / 问题记录&amp;知识回流 / 群聊&amp;频道运营 / Seaf 运营观测）；超级管理员默认全部权限（内置）。</div>
+      </div>
+
+      <div class="card" style="margin-top:14px">
+        <div class="card-title bot-config-title">数字人接入管理</div>
+        <div class="bot-config-toolbar">
+          <div class="bot-config-filters">
+            <input type="text" id="botConfigSearch" placeholder="搜索数字人、所属业务…" oninput="renderConfig()">
+            <span class="org-dept-select-wrap"><select id="botConfigStatus" onchange="renderConfig()">
+              <option value="">全部状态</option>
+              <option value="已上线">已上线</option>
+              <option value="已接入">已接入</option>
+              <option value="接入中">接入中</option>
+            </select><i data-lucide="chevron-down" aria-hidden="true"></i></span>
+          </div>
+          <div class="bot-config-actions"><button class="btn primary sm" onclick="openBotModal()">接入新数字人</button></div>
+        </div>
+        <table>
+          <thead><tr><th>数字人</th><th>所属业务</th><th>状态</th><th>同步频率</th><th>操作</th></tr></thead>
+          <tbody id="cfgBotTable"></tbody>
+        </table>
+        <div class="hint-text">通用配置：接入数字人时选择所属业务，配置完成后数字人出现在对应业务的「业务运营平台」入口下；数据源自动从该数字人拉取（无需单独配置数据源）。再在上方「组织架构与权限」中给用户授予角色并配置该数字人权限，用户登录后即可在对应业务下看到并运营。</div>
+      </div>
+    </div>
+    <div class="page" id="page-legacy-opslog">
+      <div class="legacy-card"><div class="construction-content"><img src="./construction-placeholder.png" width="160" height="160" alt="" class="construction-image"><div class="big">内容建设中</div><p>操作记录（现有功能）保持不变。</p></div></div>
+    </div>
+
+    <!-- ══════════ 数字人运营平台（新增板块） ══════════ -->
+    <div class="page" id="page-bot-platform">
+      <!-- 数字人选择与页内 Tab 已提升到标题下方的页面上下文容器。 -->
+
+      <!-- 子页：多数字人总览 -->
+      <div class="itab-page" id="itab-bot-overview">
+        <div class="card">
+          <div class="card-title">整体运营概况 <span class="info-ic" data-tip="全部已接入数字人合计 · 近 30 天口径">?</span></div>
+          <div class="overview-kpi-grid" id="overviewKpis"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">已接入数字人 <span class="hint" id="botSubHint">点击卡片进入该数字人运营看板</span></div>
+          <div class="grid digital-human-grid" id="botCards"></div>
+        </div>
+        <div class="grid grid-2">
+          <div class="card"><div class="card-title">各数字人回复量对比 <span class="info-ic" data-tip="近 30 天">?</span></div><div class="chart-box h220"><canvas id="ovMsgChart"></canvas></div></div>
+          <div class="card"><div class="card-title">各数字人活跃用户对比 <span class="info-ic" data-tip="近 30 天">?</span></div><div class="chart-box h220"><canvas id="ovUserChart"></canvas></div></div>
+        </div>
+        <div class="grid grid-2">
+          <div class="card"><div class="card-title">各数字人回复量趋势 <span class="info-ic" data-tip="每色一条 = 一个数字人">?</span></div><div class="chart-box"><canvas id="ovMsgTrend"></canvas></div></div>
+          <div class="card"><div class="card-title">活跃用户 / 会话数趋势（按数字人）</div><div class="chart-box"><canvas id="ovActTrend"></canvas></div></div>
+        </div>
+        <div class="grid grid-2">
+          <div class="card"><div class="card-title">热门问题 TOP10 <span class="info-ic" data-tip="跨全部数字人">?</span></div><div id="ovHot" class="grid" style="gap:6px"></div></div>
+          <div class="card"><div class="card-title">知识命中率对比 <span class="info-ic" data-tip="谁的知识库健康，谁的要补">?</span></div><div class="chart-box h220"><canvas id="ovChannel"></canvas></div></div>
+        </div>
+      </div>
+
+      <!-- 子页：运营看板 -->
+      <div class="itab-page" id="itab-bot-dash">
+        <div class="grid grid-2 dash-toolbar" style="margin-bottom:14px">
+          <div class="card dash-toolbar-card" style="margin:0">
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+              <span style="font-size:13px;color:var(--muted)">看板维度（可配置）：</span>
+              <span class="dash-select-wrap" data-ui-select><select id="dashDim"><option value="day">按天</option><option value="week">按周</option><option value="month">按月</option></select></span>
+              <span class="dash-select-wrap" data-ui-select><select id="dashRange"><option value="7d">近 7 天</option><option value="30d" selected>近 30 天</option><option value="90d">近 90 天</option><option value="all">累计</option></select></span>
+            </div>
+          </div>
+          <div class="card dash-toolbar-card" style="margin:0">
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+              <span style="font-size:13px;color:var(--muted)">运营报告：</span>
+              <button class="btn sm" onclick="openMetricModal()">指标口径说明</button>
+              <button class="btn primary" onclick="openReportConfig()">生成运营报告</button>
+            </div>
+          </div>
+        </div>
+        <!-- KPI 区：第一行=数字人维度（5个）；第二行=左知识库维度 + 右推推维度 -->
+        <div class="card">
+          <div class="card-title" style="font-size:13px">数字人维度</div>
+          <div class="grid grid-5 kpi-panel" id="dashKpis"></div>
+        </div>
+        <div class="grid grid-2" style="margin-top:14px">
+          <div class="card" style="margin:0">
+            <div class="card-title" style="font-size:13px">知识库维度</div>
+            <div class="grid grid-3" id="dashKbKpis"></div>
+          </div>
+          <div class="card" style="margin:0">
+            <div class="card-title" style="font-size:13px">推推维度</div>
+            <div class="grid grid-3" id="dashTtKpis"></div>
+          </div>
+        </div>
+        <div class="grid grid-2">
+          <div class="card"><div class="card-title">回复量趋势 <span class="info-ic" data-tip="= 数字人实际回复条数 · 点击数据点可下钻当日问答明细">?</span></div><div class="chart-box"><canvas id="dashMsgTrend"></canvas></div></div>
+          <div class="card"><div class="card-title">活跃用户 / 会话数趋势</div><div class="chart-box"><canvas id="dashActTrend"></canvas></div></div>
+        </div>
+        <div class="grid grid-2">
+          <div class="card"><div class="card-title">热门问题 TOP10 <span class="info-ic" data-tip="点击问题跳转到问题记录">?</span></div><div id="dashHot" class="grid" style="gap:6px"></div></div>
+          <div class="card"><div class="card-title">问题分类分布 <span class="info-ic" data-tip="哪类问题最多 → 优先补哪块知识">?</span></div><div class="chart-box h220"><canvas id="dashChannel"></canvas></div></div>
+        </div>
+      </div>
+
+      <!-- 子页：问题记录 & 知识回流 -->
+      <div class="itab-page" id="itab-bot-qa">
+        <!-- 全局时间维度筛选（作用于整个问题记录&知识回流板块：知识库总览 KPI + 对接知识库） -->
+        <div class="card module-toolbar" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <span class="org-dept-select-wrap"><select id="qaDim"><option value="day">按天</option><option value="week">按周</option><option value="month">按月</option></select><i data-lucide="chevron-down" aria-hidden="true"></i></span>
+          <span class="org-dept-select-wrap"><select id="qaRange"><option value="7">近 7 天</option><option value="30" selected>近 30 天</option><option value="90">近 90 天</option><option value="all">累计</option></select><i data-lucide="chevron-down" aria-hidden="true"></i></span>
+        </div>
+
+        <!-- ① 知识库总览：KPI（数据均来自 AI 知识库数据库，可直接拉取） -->
+        <div class="card">
+          <div class="card-title">知识库总览 <span class="info-ic" data-tip="数据来自 AI 知识库数据库 · 覆盖当前数字人对接的全部知识库 · 问答量/用户量随上方时间维度联动">?</span></div>
+          <div class="grid grid-5 kpi-panel" id="kbHealth"></div>
+        </div>
+
+        <!-- ② 对接知识库：块状卡片（与「已接入数字人」一致；已加入的纯展示，点击无动作） -->
+        <div class="card" style="margin-top:14px">
+          <div class="card-title">对接知识库 <span class="info-ic" data-tip="已加入运营工作台 · 点击「＋ 添加知识库」从你有权限的库中选择加入">?</span></div>
+          <div class="grid grid-5" id="kbLibCards"></div>
+        </div>
+
+        <!-- ③ 知识回流（核心操作区）：未命中（缺口/互联网答案）→ 确认 → 回流知识库 -->
+        <div class="card" style="margin-top:14px">
+          <div class="card-title" style="font-size:16px;justify-content:flex-start;gap:8px">知识回流 <span class="info-ic tip-left" data-tip="数字人未命中知识库时，自动搜索互联网作答（回答末尾带「来自互联网」标识），系统识别后自动进入下方回流队列，由管理员判断是否回流；群里的人工回答不再纳入回流队列（无法准确对应到用户问题）。未命中且无互联网回答的问题（缺口）可手动加入补录。流程：① 看回流队列（互联网答案自动进入 / 缺口手动加入）→ ② 编辑确认答案 → ③ 一键回流（FAQ 型库直接加问答对，文档型库聚合 FAQ 文档）">?</span></div>
+          <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center">
+            <select id="reflowSrcSel" aria-label="问题来源" style="width:140px"><option value="">全部来源</option><option value="群聊">群聊</option><option value="频道">频道</option></select>
+            <span class="hint-text" style="margin-left:auto;text-align:right">回流到哪个知识库：在右侧「回流队列」中选择</span>
+          </div>
+          <div class="grid grid-2">
+            <div style="border:1px solid var(--border);border-radius:10px;padding:10px 12px">
+              <div class="card-title" style="font-size:13px">① 未命中问题 <span class="info-ic" data-tip="未命中知识库且无互联网回答的问题（缺口）· 点击加入回流队列，填写答案后回流">?</span></div>
+              <div id="missQa" class="grid" style="gap:6px"></div>
+            </div>
+            <div style="border:1px solid var(--border);border-radius:10px;padding:10px 12px">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:6px">
+                <div class="card-title" style="font-size:13px">② 回流队列 <span class="info-ic" data-tip="确认后写入目标知识库">?</span></div>
+                <div style="display:flex;gap:8px;align-items:center" id="reflowSelBar">
+                  <label style="display:flex;align-items:center;gap:4px;font-size:13px;cursor:pointer"><input type="checkbox" id="reflowSelAll" onchange="toggleReflowAll(this)"> 全选</label>
+                  <button class="btn primary sm" onclick="batchReflow()">批量回流 <span id="reflowSelCount">0</span></button>
+                </div>
+              </div>
+              <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap">
+                <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);cursor:pointer"><b style="color:var(--text)">回流到知识库</b>
+                  <select id="reflowLibSel" style="width:240px"></select>
+                </label>
+                <span class="info-ic" style="flex:none" id="reflowHint" data-tip="选择目标知识库（FAQ 型→加问答对；文档型→聚合文档）">?</span>
+              </div>
+              <div id="reflowList" style="display:grid;gap:8px;max-height:400px;overflow-y:auto"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ④ 历史问答检索（命中状态可准确判断） -->
+        <div class="card" style="margin-top:14px">
+          <div class="card-title">历史问答检索 <span class="info-ic" data-tip="「命中」= 回答引用了知识库内容（可从日志准确判断）">?</span></div>
+          <div style="display:flex;gap:8px;margin-bottom:12px">
+            <input type="text" id="qaSearch" placeholder="搜索问题 / 关键词 / 用户…" style="flex:0 1 240px;width:240px;min-width:0">
+            <select id="qaStatus"><option value="">全部命中状态</option><option>已命中</option><option>未命中</option></select>
+            <button class="btn primary sm" onclick="renderQA()">查询</button>
+          </div>
+          <div style="max-height:340px;overflow-y:auto">
+            <table><thead><tr><th>时间</th><th>用户</th><th>问题</th><th>命中</th><th>操作</th></tr></thead><tbody id="qaTable"></tbody></table>
+          </div>
+          <div class="hint-text" id="qaCount"></div>
+        </div>
+      </div>
+
+      <!-- 子页：群聊 & 频道运营 -->
+      <div class="itab-page" id="itab-bot-groups">
+        <!-- 全局时间维度筛选（作用于整个群聊&频道运营板块） -->
+        <div class="card module-toolbar" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <span class="org-dept-select-wrap"><select id="grpDim"><option value="day">按天</option><option value="week">按周</option><option value="month">按月</option></select><i data-lucide="chevron-down" aria-hidden="true"></i></span>
+          <span class="org-dept-select-wrap"><select id="grpRange"><option value="7">近 7 天</option><option value="30" selected>近 30 天</option><option value="90">近 90 天</option><option value="all">累计</option></select><i data-lucide="chevron-down" aria-hidden="true"></i></span>
+        </div>
+
+        <!-- ① 推推总览：KPI -->
+        <div class="card" style="margin-top:14px">
+          <div class="card-title">推推总览 <span class="info-ic" data-tip="数据来自推推群消息监控 · 随上方时间维度联动">?</span></div>
+          <div class="grid grid-4 kpi-panel" id="grpKpis"></div>
+        </div>
+
+        <!-- ② 对接推推群 / 推推频道：块状卡片（样式与「对接知识库」一致） -->
+        <div class="card" style="margin-top:14px">
+          <div class="card-title">推推群 / 推推频道 <span class="info-ic" data-tip="已纳入运营监控 · 点击「＋ 添加」从有权限的群/频道中选择加入">?</span></div>
+          <div class="grid grid-5" id="grpCards"></div>
+        </div>
+
+        <!-- ④ 消息量：推推群 / 推推频道 分开展示（各群/各频道消息量；无数据时显示空提示） -->
+        <div class="grid grid-2" style="margin-top:14px">
+          <div class="card" style="margin:0">
+            <div class="card-title">推推群消息 <span class="info-ic" data-tip="各推推群的消息量 · 随上方时间维度联动">?</span></div>
+            <div class="chart-box h220" id="grpGroupBox"><canvas id="grpGroupCanvas"></canvas></div>
+          </div>
+          <div class="card" style="margin:0">
+            <div class="card-title">频道消息 <span class="info-ic" data-tip="各推推频道的消息量 · 随上方时间维度联动">?</span></div>
+            <div class="chart-box h220" id="grpChannelBox"><canvas id="grpChannelCanvas"></canvas></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Public observation demo -->
+      <div class="itab-page" id="itab-bot-seaf">
+        <div class="card">
+          <div class="card-title">Seaf 运营观测 <span class="info-ic" data-tip="公开演示占位，不连接内部系统">?</span></div>
+          <div class="notice" style="margin-bottom:12px">公开演示环境：此区域保留运营观测入口，不连接内部系统或读取真实业务数据。</div>
+          <div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;align-items:center">
+            <button class="btn primary" onclick="window.open('./observation-demo.html','_blank','noopener')">在新窗口打开演示</button>
+            <span class="hint-text">演示占位 · 无需登录</span>
+          </div>
+          <iframe id="seafFrame" data-src="./observation-demo.html" title="运营观测演示" style="width:100%;height:760px"></iframe>
+        </div>
+      </div>
+    </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 弹窗：批量授予角色 ============ -->
+<div class="modal-mask" id="grantBatchModal">
+  <div class="modal org-batch-modal">
+    <div class="m-head"><b>批量授予角色</b><button class="xbtn" onclick="closeModal('grantBatchModal')">×</button></div>
+    <div class="m-body">
+      <div class="hint-text" style="margin-bottom:16px">为当前已勾选的成员统一设置角色。</div>
+      <label style="display:block;font-size:14px;font-weight:600;margin-bottom:8px" for="orgBatchRole">授予角色</label>
+      <select id="orgBatchRole" style="width:100%">
+        <option value="user">普通用户</option>
+        <option value="accessible">可访问</option>
+        <option value="admin" selected>管理员</option>
+        <option value="super_admin">超级管理员</option>
+      </select>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:24px">
+        <button class="btn" onclick="closeModal('grantBatchModal')">取消</button>
+        <button class="btn primary" onclick="grantBatch()">确认授予</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 弹窗：切换模拟用户 ============ -->
+<div class="modal-mask" id="userModal">
+  <div class="modal" style="width:800px">
+    <div class="m-head"><b>切换模拟用户</b><button class="xbtn" onclick="closeModal('userModal')">×</button></div>
+    <div class="m-body">
+      <div class="hint-text" style="margin-bottom:12px">原型演示：真实场景中由管理员在「组织管理」里给用户分配角色与业务运营平台权限，用户登录后自动看到自己权限内的内容。这里模拟不同用户登录后的效果。</div>
+      <div id="userList" style="display:grid;gap:8px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 弹窗：指标口径说明 ============ -->
+<div class="modal-mask" id="metricModal">
+  <div class="modal" style="width:760px">
+    <div class="m-head"><b>指标口径说明</b><button class="xbtn" onclick="closeModal('metricModal')">×</button></div>
+    <div class="m-body">
+      <div class="notice" style="margin-bottom:12px">所有指标以<strong>数字人日志</strong>为统计来源（无需监控群聊全量消息）。口径需与业务方确认后固化。</div>
+      <table>
+        <thead><tr><th style="width:120px">指标</th><th style="width:300px">口径定义</th><th>口径价值（业务视角）</th></tr></thead>
+        <tbody>
+          <tr><td><b>回复量</b></td><td>数字人<strong>实际回复的条数</strong>：单聊每次回复=1条；群聊仅统计数字人被@/被提问且实际回复的，未回复的不计入</td><td>数字人真实工作量，不被群聊无关消息灌水</td></tr>
+          <tr><td><b>会话数</b></td><td><strong>连续交互片段数</strong>：同一用户与数字人 30 分钟内连续问答=1个会话；超过 30 分钟无交互再提问=新会话；群聊按用户维度切分</td><td>用户开启对话的次数，1 个会话可含多轮问答</td></tr>
+          <tr><td><b>活跃用户</b></td><td>统计周期内与数字人产生过问答交互的<strong>去重用户数</strong>（user_id 去重）</td><td>真实使用人数与渗透率</td></tr>
+          <tr><td><b>平均问答轮次</b></td><td>回复量 ÷ 会话数（=每个会话平均几轮问答）。<strong>随统计窗口变化</strong>：会话密度非线性增长，近 7 天新用户多轮次偏低、近 90 天老用户多轮次偏高</td><td>轮次≈1 问题简单；轮次&gt;3 首次回答质量待改进</td></tr>
+          <tr><td><b>主动解决率</b></td><td>AI 回复后用户<strong>未转人工/未建工单/未负向反馈</strong>（含沉默结束）即算 AI 解决。<strong>随统计窗口变化</strong>。负向反馈关键词表由<strong>平台内置默认词表</strong>维护（如"不行/没用/不对/还是没解决"等），业务侧无需配置</td><td>衡量 AI 自动解决能力与人工成本节省</td></tr>
+          <tr><td><b>知识命中率</b></td><td>问题<strong>命中知识库条目并直接作答</strong>的占比（命中=检索到相关条目作为回答依据）。<strong>按时间窗口统计</strong>（周报同口径），随窗口微幅波动（数据库实证近 7/30/90 天：98.2% / 98.0% / 98.3%）</td><td>知识库够不够用，低于 90% 需补录（见未命中问题列表）</td></tr>
+          <tr><td><b>高频问题覆盖率</b></td><td>TOP 高频问题中<strong>已有对应知识条目</strong>的比例</td><td>高频问题是否被覆盖，缺口=优先补录清单</td></tr>
+        </tbody>
+      </table>
+      <div class="hint-text" style="margin-top:10px">✅ 口径已确认：会话超时窗口 <strong>30 分钟</strong>；群聊按<strong>用户维度</strong>切分；负向反馈关键词表由<strong>平台维护</strong>（默认词表，业务侧无需配置）；命中率/轮次/解决率等占比比值指标<strong>按所选时间窗口统计</strong>（7/30/90 天取值不同）。</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 弹窗：问答明细 ============ -->
+<div class="modal-mask" id="qaModal">
+  <div class="modal">
+    <div class="m-head"><b>问答明细 · 下钻</b><button class="xbtn" onclick="closeModal('qaModal')">×</button></div>
+    <div class="m-body">
+      <table><thead><tr><th>时间</th><th>用户</th><th>问题</th><th>回答</th><th>解决</th></tr></thead><tbody id="qaModalBody"></tbody></table>
+      <div class="hint-text">原型示意：真实场景每个汇总（回复量/会话数/主动解决率）都可下钻到这一层的明细。</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 弹窗：添加知识库 ============ -->
+<div class="modal-mask" id="libPickerModal">
+  <div class="modal" style="width:640px">
+    <div class="m-head"><b>添加知识库到运营工作台</b><button class="xbtn" onclick="closeModal('libPickerModal')">×</button></div>
+    <div class="m-body">
+      <div class="hint-text" style="margin-bottom:10px">以下为你有权限的知识库（来自 AI 知识库平台）。加入后该库的运营数据（命中率/问答量）会纳入本工作台统计；文档/FAQ 管理仍在 AI 知识库平台操作。</div>
+      <div id="libPickerList" style="display:grid;gap:8px;max-height:420px;overflow-y:auto"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 弹窗：添加推推群/频道 ============ -->
+<div class="modal-mask" id="grpPickerModal">
+  <div class="modal" style="width:640px">
+    <div class="m-head"><b>添加推推群 / 推推频道到运营监控</b><button class="xbtn" onclick="closeModal('grpPickerModal')">×</button></div>
+    <div class="m-body">
+      <div class="hint-text" style="margin-bottom:10px">以下为你有权限的推推群/频道（来自推推平台）。加入后纳入消息监控与趋势统计，群内消息明细仍在推推平台查看。</div>
+      <div id="grpPickerList" style="display:grid;gap:8px;max-height:420px;overflow-y:auto"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 弹窗：三级权限编辑（业务 → 数字人 → 功能模块） ============ -->
+<div class="modal-mask" id="permModal">
+  <div class="modal" style="width:760px">
+    <div class="m-head"><b>编辑权限 · <span id="permUserName"></span></b><button class="xbtn" onclick="closeModal('permModal')">×</button></div>
+    <div class="m-body">
+      <div class="hint-text" style="margin-bottom:12px">三级权限：<strong>一级</strong> = 可访问的业务运营平台业务 → <strong>二级</strong> = 该业务下可访问的数字人 → <strong>三级</strong> = 该数字人下的功能模块。勾选业务后其下数字人默认全选，可单独调整；未勾选的业务其下数字人/模块不可用。</div>
+      <div id="permTree" style="display:grid;gap:12px;max-height:440px;overflow-y:auto"></div>
+      <div style="display:flex;gap:10px;margin-top:16px">
+        <button class="btn primary" onclick="savePerm()">保存</button>
+        <button class="btn" onclick="closeModal('permModal')">取消</button>
+        <span class="hint-text" style="margin-left:auto">保存后，用户登录「业务运营平台」即按此权限看到对应业务 / 数字人 / 功能模块</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 弹窗：接入新数字人（通用配置） ============ -->
+<div class="modal-mask" id="botModal">
+  <div class="modal" style="width:600px">
+    <div class="m-head"><b>接入新数字人</b><button class="xbtn" onclick="closeModal('botModal')">×</button></div>
+    <div class="m-body">
+      <div class="hint-text" style="margin-bottom:12px">通用接入配置：配置完成后数字人自动出现在所选业务的「业务运营平台」入口下，数据源自动从该数字人拉取（无需配置数据源）；再在「用户权限分配」中给用户开通该数字人权限即可。</div>
+      <div style="display:grid;gap:12px">
+        <label style="display:grid;gap:6px;font-size:13px;color:var(--muted)"><b style="color:var(--text)">数字人名称</b>
+          <input id="botName" type="text" placeholder="如：HR数字人 / 采购数字人" style="font-size:14px">
+        </label>
+        <label style="display:grid;gap:6px;font-size:13px;color:var(--muted)"><b style="color:var(--text)">所属业务（一级入口）</b>
+          <select id="botEntry" style="font-size:14px">
+            <option value="it">IT业务</option>
+            <option value="admin">行政业务</option>
+            <option value="jingfen">经分业务</option>
+            <option value="security">安全终端业务</option>
+            <option value="test">测试业务</option>
+          </select>
+        </label>
+        <label style="display:grid;gap:6px;font-size:13px;color:var(--muted)"><b style="color:var(--text)">同步频率</b>
+          <select id="botSync" style="font-size:14px">
+            <option>每 1 分钟</option>
+            <option selected>每 5 分钟</option>
+            <option>每 15 分钟</option>
+            <option>每小时</option>
+          </select>
+        </label>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:16px">
+        <button class="btn primary" onclick="addBot()">确认接入</button>
+        <button class="btn" onclick="closeModal('botModal')">取消</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 弹窗：AI 抽离 → 聚合 FAQ 文档 ============ -->
+<div class="modal-mask" id="aiModal">
+  <div class="modal" style="width:720px">
+    <div class="m-head"><b>AI 抽离碎片化内容 → 聚合成 FAQ 文档</b><button class="xbtn" onclick="closeModal('aiModal')">×</button></div>
+    <div class="m-body">
+      <div class="notice" style="margin-bottom:12px">云盘 AI 知识库以<strong>文档</strong>为单元。碎片化的高频问题/工单内容由 AI <strong>按主题聚合成一份文档</strong>后上传，上传后自动向量化，用户提问即可命中。</div>
+      <div class="flow">
+        <div class="step done">① AI 聚合起草</div><div class="arrow">→</div>
+        <div class="step">② 业务确认</div><div class="arrow">→</div>
+        <div class="step">③ 上传知识库</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;margin:12px 0">
+        <span style="font-size:13px;color:var(--muted)">上传到知识库：</span>
+        <select id="aiLibSel" style="flex:1"></select>
+      </div>
+      <div id="aiDocs" style="display:grid;gap:10px"></div>
+      <div style="display:flex;gap:10px;margin-top:14px;align-items:center">
+        <button class="btn primary" id="aiConfirmBtn" onclick="confirmAIChip(this)">确认上传所选文档</button>
+        <button class="btn" onclick="closeModal('aiModal')">取消</button>
+        <span class="hint-text">确认后上传到上方选择的知识库</span>
+      </div>
+      <div class="hint-text" style="margin-top:10px">铁律：AI 只起草、不落库；人工改过的字段 AI 永不覆盖。文档上传前可编辑/删除，确认后进入「解析中」→「已解析」。</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 弹窗：报告草稿 ============ -->
+<div class="modal-mask" id="reportModal">
+  <div class="modal">
+    <div class="m-head"><b>运营报告 · AI 草稿</b><button class="xbtn" onclick="closeModal('reportModal')">×</button></div>
+    <div class="m-body" id="reportBody"></div>
+  </div>
+</div>
+
+<!-- ============ 弹窗：报告配置 ============ -->
+<div class="modal-mask" id="reportConfigModal">
+  <div class="modal" style="width:520px">
+    <div class="m-head"><b>生成运营报告</b><button class="xbtn" onclick="closeModal('reportConfigModal')">×</button></div>
+    <div class="m-body">
+      <div style="display:grid;gap:16px">
+        <div>
+          <div style="font-size:13px;color:var(--muted);margin-bottom:8px">报告类型</div>
+          <div class="seg" id="reportTypeSeg">
+            <button class="seg-btn active" data-rt="week" onclick="setReportType('week')">周报</button>
+            <button class="seg-btn" data-rt="month" onclick="setReportType('month')">月报</button>
+          </div>
+        </div>
+        <label style="display:grid;gap:8px;font-size:13px;color:var(--muted)" for="reportPeriod">报告周期
+          <select id="reportPeriod"></select>
+        </label>
+        <div class="hint-text" id="reportLimitHint">周报支持最近 8 周 · 月报支持最近 6 个月</div>
+        <div style="display:flex;justify-content:flex-end;gap:8px">
+          <button class="btn" onclick="closeModal('reportConfigModal')">取消</button>
+          <button class="btn primary" onclick="genReport()">生成草稿</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ══════════════ 模拟数据（脱敏，原型用） ══════════════ */
+const BOTS = {
+    it:    { id:'it',    ico:'IT', avatar:'avatar-it.png', color:'#1f5fe8', name:'IT数字人', status:'已上线', desc:'IT 客服 / 工单', openScope:['IT服务部'], msg:18642, users:3124, sessions:8952, solve:0.82, active:0.71, hitRate:0.87, trend:[420,460,505,488,530,572,548,610,655,632,690,720,685,742,770,756,801,828,795,860,882,845,910,936,905,948,975,962,1010,1042] },
+    admin:{ id:'admin', ico:'行', avatar:'avatar-admin.png', color:'#0e8f58', name:'行政数字人', status:'已接入', desc:'行政 / 推推群', openScope:['行政部'], msg:9124,  users:1876, sessions:4231, solve:0.76, active:0.58, hitRate:0.82, trend:[220,240,258,245,268,280,272,301,320,312,335,348,330,352,371,365,388,402,390,415,430,420,445,458,449,470,485,478,502,516] },
+    jingfen:{id:'jingfen', ico:'经', avatar:'avatar-jingfen.png', color:'#c77d0a', name:'经分数字人', status:'接入中', desc:'经营分析 / 报表', openScope:['经分业务部'], msg:0, users:0, sessions:0, solve:0, active:0, hitRate:0, trend:[] },
+    security:{id:'security', ico:'安', avatar:'avatar-security.png', color:'#7c3aed', name:'终端安全数字人', status:'已上线', desc:'终端安全 / 告警', openScope:['安全终端部'], msg:5840, users:982, sessions:2750, solve:0.78, active:0.61, hitRate:0.85, trend:[120,132,145,138,152,166,158,172,185,178,192,204,196,210,224,215,230,242,235,248,260,252,266,278,270,284,296,288,302,315] },
+    // 测试业务：2 个数字人
+    testA:{ id:'testA', ico:'甲', avatar:'avatar-testA.png', color:'#2bb3c0', name:'测试数字人A', status:'已上线', desc:'测试业务 · 问答助手', openScope:['测试业务部'], msg:6240, users:1120, sessions:3015, solve:0.79, active:0.63, hitRate:0.84, trend:[180,195,210,202,225,240,231,252,268,260,275,290,281,298,315,308,322,340,331,352,366,358,372,388,379,395,410,401,418,432] },
+    testB:{ id:'testB', ico:'乙', avatar:'avatar-testB.png', color:'#e0568a', name:'测试数字人B', status:'已上线', desc:'测试业务 · 流程助手', openScope:['测试业务部'], msg:3860, users:742, sessions:1826, solve:0.73, active:0.55, hitRate:0.79, trend:[95,105,118,110,124,132,126,140,152,145,158,166,159,172,184,177,190,198,191,205,214,208,220,231,224,236,245,239,252,261] },
+};
+// 业务入口 → 数字人列表（一个业务可挂多个数字人）
+const ENTRY_BOTS = {
+  it:       ['it'],
+  admin:    ['admin'],
+  jingfen:  ['jingfen'],
+  security: ['security'],
+  test:     ['testA','testB'],
+};
+// 数字人 → 所属业务入口（反向映射，用于业务用户落点）
+const BOT_ENTRY = { it:'it', admin:'admin', jingfen:'jingfen', security:'security', testA:'test', testB:'test' };
+const USERS = {
+  demoUser1:   { name:'演示用户01', dept:'演示运营团队', role:'内部运营 · 超管', bots:['it','admin','jingfen','security','testA','testB'], super:true,  avatar:'演' },
+  demoUser2:  { name:'演示用户02', dept:'—', role:'超管', bots:['it','admin','jingfen','security','testA','testB'], super:true, avatar:'演' },
+  demoUser3:  { name:'演示用户03', dept:'IT 服务部', role:'IT业务侧', bots:['it'], super:false, avatar:'演' },
+  demoUser4:  { name:'演示用户06', dept:'行政部', role:'行政业务侧', bots:['admin'], super:false, avatar:'演' },
+  demoUser5:   { name:'演示用户08', dept:'测试业务', role:'测试业务侧', bots:['testA','testB'], super:false, avatar:'演' },
+  demoUser6:  { name:'演示用户09', dept:'安全终端部', role:'安全终端业务侧', bots:['security'], super:false, avatar:'演' },
+};
+// 规则：拥有 ≥2 个数字人 → 显示「多数字人总览」且默认落在总览；仅 1 个 → 隐藏总览、默认直达运营看板
+function showOverviewOf(u){ return u.bots.length >= 2; }
+const HOT_QA = {
+  it:['如何重置 VPN 密码？','OA 账号无法登录如何处理？','如何申请开通内网权限？','打印机无法连接怎么办？','如何申请新邮箱 / 别名？','IT 工单多久能处理完？','如何安装并激活办公软件？','WiFi 连不上如何处理？','如何申请出差网络账号？','如何找回被锁定的账号？'],
+  admin:['如何申请会议室？','如何预约访客通行证？','行政服务热线是多少？','如何申请办公用品？','班车时刻表在哪里查？','如何申请工位 / 调工位？','食堂投诉如何处理？','如何申请名片？','出差酒店预订流程？','办公区报修如何提交？'],
+  testA:['测试业务如何发起问答？','测试数字人A 支持哪些功能？','如何查看测试数据报表？','测试环境如何申请账号？','测试数据多久更新一次？','如何反馈测试问题？'],
+  testB:['测试流程如何发起审批？','测试数字人B 能处理什么流程？','流程卡住了怎么办？','如何查看流程进度？','测试流程如何修改？','审批超时如何处理？'],
+  security:['什么是入侵防御系统 IPS？','NAC 网络准入控制的作用是什么？','终端安全告警如何处置？','如何配置身份认证与授权？','关键信息基础设施保护条例要求有哪些？','木马程序如何防范？','远程服务漏洞如何排查？','安全基线如何检查？'],
+};
+const QA_RECORDS = {
+  it:[
+    {t:'09-02 10:24', u:'某3', q:'如何重置 VPN 密码？', hit:'已命中'},
+    {t:'09-02 09:51', u:'某1', q:'OA 账号无法登录如何处理？', hit:'已命中'},
+    {t:'09-02 09:12', u:'某7', q:'如何申请开通内网权限？', hit:'已命中'},
+    {t:'09-01 18:40', u:'某5', q:'打印机无法连接怎么办？', hit:'已命中'},
+    {t:'09-01 17:22', u:'某2', q:'如何申请新邮箱别名？', hit:'已命中'},
+    {t:'09-01 16:05', u:'某9', q:'IT 工单多久能处理完？', hit:'未命中'},
+    {t:'09-01 15:30', u:'某4', q:'WiFi 连不上如何处理？', hit:'已命中'},
+    {t:'09-01 14:18', u:'某8', q:'如何安装并激活办公软件？', hit:'已命中'},
+    {t:'08-31 11:02', u:'某6', q:'如何找回被锁定的账号？', hit:'已命中'},
+    {t:'08-31 09:45', u:'某1', q:'VPN 无法连接，报错 800', hit:'已命中'},
+  ],
+  admin:[
+    {t:'09-02 10:05', u:'某甲', q:'如何申请会议室？', hit:'已命中'},
+    {t:'09-02 09:30', u:'某乙', q:'如何预约访客通行证？', hit:'已命中'},
+    {t:'09-01 19:12', u:'某丙', q:'班车时刻表在哪里查？', hit:'已命中'},
+    {t:'09-01 18:02', u:'某丁', q:'如何申请办公用品？', hit:'已命中'},
+  ],
+  testA:[
+    {t:'09-02 10:24', u:'某X', q:'测试业务如何发起问答？', hit:'已命中'},
+    {t:'09-02 09:51', u:'某Y', q:'测试数字人A 支持哪些功能？', hit:'已命中'},
+    {t:'09-01 16:05', u:'某Z', q:'测试数据多久更新一次？', hit:'未命中'},
+  ],
+  testB:[
+    {t:'09-02 11:02', u:'某M', q:'测试流程如何发起审批？', hit:'已命中'},
+    {t:'09-02 10:30', u:'某N', q:'流程卡住了怎么办？', hit:'已命中'},
+  ],
+  security:[
+    {t:'09-02 10:24', u:'某a', q:'什么是入侵防御系统 IPS？', hit:'已命中'},
+    {t:'09-02 09:51', u:'某b', q:'终端安全告警如何处置？', hit:'已命中'},
+    {t:'09-02 09:12', u:'某c', q:'NAC 网络准入控制的作用？', hit:'已命中'},
+    {t:'09-01 18:40', u:'某d', q:'关键信息基础设施保护条例要求？', hit:'已命中'},
+    {t:'09-01 17:22', u:'某e', q:'木马程序如何防范？', hit:'已命中'},
+    {t:'09-01 16:05', u:'某f', q:'远程服务漏洞如何排查？', hit:'未命中'},
+  ],
+};
+// 数字人对接的知识库（云盘 AI 知识库：文档上传→向量化，无"条目/类目"概念）
+// 命中率来自 ai_session_chat_history 问答日志解析（数据库可拿）
+const BOT_LIBS = {
+  it: [
+    { name:'IT运维知识库', docs:124, size:'856MB', hit:0.89, updated:'今天 08:00', status:'已接入',
+      files:[
+        {n:'VPN配置手册.pdf', s:'2.4MB', t:'08-28', st:'已解析'},
+        {n:'内网权限申请流程.docx', s:'1.1MB', t:'08-25', st:'已解析'},
+        {n:'打印机常见故障排查.pdf', s:'3.2MB', t:'08-20', st:'已解析'},
+        {n:'办公软件安装激活指南.docx', s:'2.0MB', t:'08-15', st:'已解析'},
+        {n:'账号锁定自助解锁流程.docx', s:'0.8MB', t:'08-10', st:'已解析'},
+      ] },
+    { name:'IT账号权限知识库', docs:68, size:'320MB', hit:0.84, updated:'昨天', status:'已接入',
+      files:[
+        {n:'OA账号权限申请规范.pdf', s:'1.6MB', t:'08-27', st:'已解析'},
+        {n:'邮箱别名申请指引.docx', s:'0.6MB', t:'08-22', st:'已解析'},
+        {n:'权限审批流程说明.pdf', s:'1.2MB', t:'08-18', st:'已解析'},
+      ] },
+    { name:'IT新员工指南', docs:45, size:'210MB', hit:0.76, updated:'3天前', status:'已接入',
+      files:[
+        {n:'新员工IT入职手册.pdf', s:'4.5MB', t:'08-12', st:'已解析'},
+        {n:'常用系统账号开通清单.xlsx', s:'0.9MB', t:'08-05', st:'已解析'},
+      ] },
+  ],
+  admin: [
+    { name:'行政服务知识库', docs:86, size:'430MB', hit:0.82, updated:'今天 08:00', status:'已接入',
+      files:[
+        {n:'会议室申请流程.pdf', s:'1.2MB', t:'08-26', st:'已解析'},
+        {n:'访客通行证预约指南.docx', s:'0.7MB', t:'08-21', st:'已解析'},
+        {n:'班车时刻表及路线说明.pdf', s:'2.8MB', t:'08-14', st:'已解析'},
+      ] },
+    { name:'行政员工福利知识库', docs:52, size:'260MB', hit:0.79, updated:'4天前', status:'已接入',
+      files:[
+        {n:'办公用品申请规范.docx', s:'0.5MB', t:'08-09', st:'已解析'},
+        {n:'员工福利政策汇总.pdf', s:'3.1MB', t:'08-02', st:'已解析'},
+      ] },
+  ],
+  testA: [
+    { name:'测试问答知识库', docs:30, size:'120MB', hit:0.84, updated:'今天 08:00', status:'已接入',
+      files:[
+        {n:'测试问答使用指引.pdf', s:'1.8MB', t:'08-24', st:'已解析'},
+        {n:'测试环境账号申请流程.docx', s:'0.6MB', t:'08-19', st:'已解析'},
+      ] },
+  ],
+  testB: [
+    { name:'测试流程知识库', docs:26, size:'98MB', hit:0.79, updated:'昨天', status:'已接入',
+      files:[
+        {n:'测试流程发起指引.pdf', s:'2.2MB', t:'08-23', st:'已解析'},
+        {n:'流程卡住自助排查手册.docx', s:'1.4MB', t:'08-17', st:'已解析'},
+      ] },
+  ],
+  security: [
+    { name:'网络安全基础知识库', docs:1109, size:'186MB', hit:0.85, updated:'今天 08:00', status:'已接入', owner:'演示用户13',
+      files:[
+        {n:'入侵防御系统【IPS】.md', s:'5.2KB', t:'08-25', st:'已解析'},
+        {n:'网络准入控制【NAC】.md', s:'5.5KB', t:'08-25', st:'已解析'},
+        {n:'身份认证与授权【Authentication_and_Authorization】.md', s:'5.7KB', t:'08-25', st:'已解析'},
+        {n:'关键信息基础设施安全保护条例【745号令】.md', s:'4.9KB', t:'08-25', st:'已解析'},
+        {n:'T1112_Modify_Registry.md', s:'1.5KB', t:'08-25', st:'已解析'},
+        {n:'T1133_External_Remote_Services.md', s:'1.8KB', t:'08-25', st:'已解析'},
+        {n:'数说安全【数说安全】.md', s:'0.7KB', t:'08-25', st:'已解析'},
+      ] },
+    { name:'示例产品深度知识库', docs:2532, size:'16.9GB', hit:0.88, updated:'今天 08:00', status:'已接入', owner:'演示用户13',
+      files:[
+        {n:'示例产品安全能力白皮书.pdf', s:'8.2MB', t:'08-20', st:'已解析'},
+        {n:'终端防护产品使用指南.docx', s:'3.4MB', t:'08-18', st:'已解析'},
+      ] },
+    { name:'招投标知识库', docs:16, size:'0.5MB', hit:0.72, updated:'2天前', status:'已接入', owner:'演示用户13',
+      files:[
+        {n:'安全项目投标应答模板.docx', s:'1.1MB', t:'08-16', st:'已解析'},
+        {n:'标书常见问题Q&A.pdf', s:'2.3MB', t:'08-10', st:'已解析'},
+      ] },
+    { name:'示例产品基础知识FAQ', type:'faq', docs:186, size:'0.9MB', hit:0.83, updated:'今天 15:17', status:'已接入', owner:'演示用户13',
+      items:[
+        {q:'示例安全产品企业版支持哪些操作系统？', a:'支持 Windows 7/10/11 及服务器版本，Mac 端支持 macOS 10.15 及以上。', src:'FAQ 数据集', st:'已上线'},
+        {q:'如何部署 示例终端安全管理系统？', a:'下载控制台安装包 → 部署控制台 → 下发终端 Agent → 完成注册接入。', src:'FAQ 数据集', st:'已上线'},
+        {q:'终端离线超过多久会被判定失联？', a:'默认 7 天无心跳判定失联，可在控制台策略中调整。', src:'FAQ 数据集', st:'已上线'},
+        {q:'EDR 与火绒是否可以同时安装？', a:'不建议同时安装多款终端防护产品，可能存在驱动冲突，建议统一使用一款。', src:'人工回流·群聊', st:'已上线'},
+        {q:'勒索病毒加密后的文件能否恢复？', a:'若终端开启文件保险箱或备份策略可恢复，未开启则无法直接恢复，建议启用防护。', src:'人工回流·群聊', st:'已上线'},
+      ] },
+  ],
+};
+// 用户有权限的知识库池（从 AI 知识库平台拉取；含演示用户13创建的演示库）
+// 已加入的显示在「对接知识库」；未加入的可通过「＋ 添加知识库」加入运营工作台
+const KB_POOL = {
+  security: [
+    { name:'网络安全基础知识库', type:'doc', docs:1109, size:'186MB', hit:0.85, updated:'今天 08:00' },
+    { name:'示例产品深度知识库', type:'doc', docs:2532, size:'16.9GB', hit:0.88, updated:'今天 08:00' },
+    { name:'招投标知识库', type:'doc', docs:16, size:'0.5MB', hit:0.72, updated:'2天前' },
+    { name:'示例产品基础知识FAQ', type:'faq', docs:186, size:'0.9MB', hit:0.83, updated:'今天 15:17' },
+    { name:'产品基础知识库', type:'doc', docs:1087, size:'8.5GB', hit:0.90, updated:'3天前' },
+    { name:'鱼塘方案库', type:'doc', docs:1545, size:'6.0GB', hit:0.91, updated:'4天前' },
+    { name:'竞品对比库', type:'doc', docs:28, size:'247MB', hit:0.68, updated:'5天前' },
+    { name:'项目案例库', type:'doc', docs:7, size:'569MB', hit:0.70, updated:'6天前' },
+    { name:'售前话术库', type:'doc', docs:1, size:'0.1MB', hit:0.60, updated:'30天前' },
+  ],
+  it: [
+    { name:'IT运维知识库', type:'doc', docs:124, size:'856MB', hit:0.89, updated:'今天 08:00' },
+    { name:'IT账号权限知识库', type:'doc', docs:68, size:'320MB', hit:0.84, updated:'昨天' },
+    { name:'IT新员工指南', type:'doc', docs:45, size:'210MB', hit:0.76, updated:'3天前' },
+  ],
+  admin: [
+    { name:'行政服务知识库', type:'doc', docs:86, size:'430MB', hit:0.82, updated:'今天 08:00' },
+    { name:'行政员工福利知识库', type:'doc', docs:52, size:'260MB', hit:0.79, updated:'4天前' },
+  ],
+  testA: [ { name:'测试问答知识库', type:'doc', docs:30, size:'120MB', hit:0.84, updated:'今天 08:00' } ],
+  testB: [ { name:'测试流程知识库', type:'doc', docs:26, size:'98MB', hit:0.79, updated:'昨天' } ],
+};
+const GROUPS = {
+  it:[
+    {n:'IT服务-问题反馈群', m:392, msg:986, act:'高', bad:'', ch:0},
+    {n:'IT运维-通知群', m:286, msg:412, act:'中', bad:'', ch:1},
+    {n:'新员工-IT答疑群', m:168, msg:310, act:'中', bad:'', ch:0},
+    {n:'VPN/账号-支持群', m:245, msg:288, act:'低', bad:'连续 3 日无回复', ch:0},
+  ],
+  admin:[
+    {n:'行政服务-全体群', m:486, msg:1240, act:'高', bad:'', ch:0},
+    {n:'班车-意见反馈群', m:354, msg:205, act:'低', bad:'连续 3 日无回复', ch:0},
+    {n:'新员工-行政答疑群', m:168, msg:310, act:'中', bad:'', ch:0},
+    {n:'食堂/办公区-报修群', m:302, msg:458, act:'高', bad:'', ch:0},
+  ],
+  testA:[
+    {n:'测试业务-问答反馈群', m:126, msg:420, act:'高', bad:'', ch:0},
+    {n:'测试业务-数据答疑群', m:98, msg:260, act:'中', bad:'', ch:0},
+  ],
+  testB:[
+    {n:'测试业务-流程审批群', m:142, msg:380, act:'高', bad:'', ch:0},
+    {n:'测试业务-流程问题群', m:88, msg:190, act:'中', bad:'', ch:0},
+  ],
+  security:[
+    {n:'终端安全-告警响应群', m:312, msg:860, act:'高', bad:'', ch:0},
+    {n:'安全运营-通报群', m:268, msg:540, act:'高', bad:'', ch:1},
+    {n:'安全基线-整改群', m:196, msg:320, act:'中', bad:'', ch:0},
+  ],
+};
+// 有权限的推推群/频道池（可从推推平台拉取；未加入的通过「＋ 添加」纳入监控）
+const GROUPS_POOL = {
+  it: [
+    {n:'IT服务-问题反馈群', m:392, msg:986, ch:0},
+    {n:'IT运维-通知频道', m:286, msg:412, ch:1},
+    {n:'新员工-IT答疑群', m:168, msg:310, ch:0},
+    {n:'VPN/账号-支持群', m:245, msg:288, ch:0},
+    {n:'IT公告-发布频道', m:512, msg:150, ch:1},
+  ],
+  admin: [
+    {n:'行政服务-全体群', m:486, msg:1240, ch:0},
+    {n:'班车-意见反馈群', m:354, msg:205, ch:0},
+    {n:'新员工-行政答疑群', m:168, msg:310, ch:0},
+    {n:'食堂/办公区-报修群', m:302, msg:458, ch:0},
+    {n:'行政通知-频道', m:610, msg:96, ch:1},
+  ],
+  testA: [
+    {n:'测试业务-问答反馈群', m:126, msg:420, ch:0},
+    {n:'测试业务-数据答疑群', m:98, msg:260, ch:0},
+  ],
+  testB: [
+    {n:'测试业务-流程审批群', m:142, msg:380, ch:0},
+    {n:'测试业务-流程问题群', m:88, msg:190, ch:0},
+  ],
+  security: [
+    {n:'终端安全-告警响应群', m:312, msg:860, ch:0},
+    {n:'安全运营-通报频道', m:268, msg:540, ch:1},
+    {n:'安全基线-整改群', m:196, msg:320, ch:0},
+    {n:'威胁情报-发布频道', m:420, msg:210, ch:1},
+    {n:'安全应急-值班群', m:150, msg:380, ch:0},
+  ],
+};
+const CHANNELS = {
+  it:    { labels:['推推群','IM/企微','工单系统','网页/客户端'], data:[38,27,22,13] },
+  admin: { labels:['推推群','IM/企微','网页/客户端','人工转接'], data:[46,24,18,12] },
+  jingfen:{labels:['报表订阅','IM/企微','网页/客户端'], data:[55,30,15] },
+  testA: { labels:['推推群','IM/企微','网页/客户端'], data:[52,28,20] },
+  testB: { labels:['IM/企微','推推群','网页/客户端'], data:[44,36,20] },
+  security:{ labels:['告警中心','IM/企微','工单系统','网页/客户端'], data:[41,29,18,12] },
+};
+// 问题分类分布（业务重点：哪类问题最多 → 优先补哪块知识）
+const CLASS_DIST = {
+  it:     { labels:['账号与权限','网络与系统','办公软件','硬件与设备','业务系统','其他'], data:[32,24,18,12,9,5] },
+  admin:  { labels:['办公服务','会议室/访客','班车/食堂','员工福利','其他'], data:[38,22,18,14,8] },
+  testA:  { labels:['测试问答','测试环境','数据报表','账号权限','其他'], data:[35,28,20,10,7] },
+  testB:  { labels:['流程审批','流程卡顿','流程修改','审批超时','其他'], data:[40,24,16,12,8] },
+  security:{ labels:['入侵防护','网络准入','身份认证','告警处置','合规要求','其他'], data:[28,22,18,15,12,5] },
+};
+// 未命中问题（未命中知识库且无互联网回答 → 缺口，点击加入回流队列补录）
+const MISS_QA = {
+  it:     ['如何批量重置部门内多名员工的 VPN？','VPN 登录后无法访问内网特定系统','旧电脑数据迁移到新电脑怎么操作？'],
+  admin:  ['新员工入职第一周的行政事项清单','会议室设备（投屏/麦克风）使用教程','节假日值班如何申请调休？'],
+  testA:  ['测试数据如何导出为 Excel？','测试环境与生产环境的差异说明'],
+  testB:  ['流程审批被退回后如何重新提交？','如何批量撤回已发起的流程？'],
+  security:['EDR 与防火墙的联动配置方法','勒索病毒加密文件的恢复方案','等保测评中终端安全的要求项'],
+};
+// 知识回流-互联网答案：数字人未命中知识库 → 搜索互联网作答（回答末尾带「来自互联网」标识）→ 系统自动识别后进入回流队列，由管理员确认是否回流
+// 群里人工回答不再纳入（上下文无法准确对应到用户问题）；未命中且无互联网回答的问题走 MISS_QA 缺口
+const REFLOWS = {
+  it: [
+    { q:'如何批量重置部门内多名员工的 VPN？', a:'在 VPN 管理后台的用户管理中，可批量选择目标用户执行重置操作；重置后用户需使用新凭据重新登录。（来自互联网）', src:'群聊', group:'IT服务-问题反馈群', t:'今天 14:32', who:'数字人 · 互联网检索' },
+    { q:'打印机驱动安装后仍无法连接？', a:'先确认打印机 IP 与本机处于同一网段，并重新安装官方驱动；若仍失败，可检查 Print Spooler 打印服务是否已启动。（来自互联网）', src:'群聊', group:'IT服务-问题反馈群', t:'今天 10:15', who:'数字人 · 互联网检索' },
+    { q:'WiFi 连不上如何处理？', a:'确认设备在无线覆盖范围内，忘记网络后重新连接；企业 WiFi 还需确认账号已开通无线接入权限。（来自互联网）', src:'频道', group:'IT运维-通知频道', t:'昨天 17:20', who:'数字人 · 互联网检索' },
+  ],
+  admin: [
+    { q:'会议室投影仪连不上怎么办？', a:'先检查 HDMI 线是否插紧并切换投影仪输入源；仍无法显示时，可联系行政领取备用转接头。（来自互联网）', src:'群聊', group:'行政服务-全体群', t:'今天 15:02', who:'数字人 · 互联网检索' },
+    { q:'出差酒店怎么预订？', a:'一般通过 OA 出差申请流程提交后自动生成预订链接，超标部分需分管领导审批。（来自互联网）', src:'频道', group:'行政通知-频道', t:'昨天 09:40', who:'数字人 · 互联网检索' },
+  ],
+  security: [
+    { q:'示例终端安全管理系统如何批量下发补丁？', a:'在控制台的补丁管理模块新建任务，选择目标终端分组后即可立即或定时下发。（来自互联网）', src:'群聊', group:'终端安全-告警响应群', t:'今天 14:32', who:'数字人 · 互联网检索' },
+    { q:'U 盘被禁用后如何申请临时白名单？', a:'提交安全申请工单并注明用途与使用时间，审批通过后由管理员添加设备白名单。（来自互联网）', src:'频道', group:'安全运营-通报频道', t:'今天 11:08', who:'数字人 · 互联网检索' },
+    { q:'终端杀毒误报业务软件怎么处理？', a:'可在控制台将该软件加入信任区，同时提交误报申诉交由病毒分析团队复核。（来自互联网）', src:'群聊', group:'安全基线-整改群', t:'昨天 16:45', who:'数字人 · 互联网检索' },
+  ],
+  testA: [], testB: [],
+};
+let reflowQueue = [];   // 手动加入的回流项（缺口=未命中且无互联网回答 / 历史问答=命中了但答得不理想）
+let ignoredReflows = new Set();   // 管理员忽略的互联网答案（原型内保持忽略状态）
+function addMissToReflow(q){
+  if(reflowQueue.some(r=>r.q===q)) { alert('该问题已在回流队列中'); return; }
+  reflowQueue.push({ q, a:'', type:'gap', src:'缺口', group:'未命中问题', t:'刚刚', who:'待补充答案' });
+  renderReflow();
+  const el = $('reflowList'); if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+}
+/* 历史问答检索 → 加入回流：数字人答得不理想但命中了知识库，管理员修改答案后回流 */
+function addQAtoReflow(q){
+  if(reflowQueue.some(r=>r.q===q)) { alert('该问题已在回流队列中'); return; }
+  reflowQueue.push({ q, a:'', type:'gap', src:'历史问答', group:'历史问答检索', t:'刚刚', who:'待补充答案' });
+  renderReflow();
+  const el = $('reflowList'); if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+}
+/* 后台组织管理：业务入口名称 / 功能模块 */
+const ENTRY_NAME = { it:'IT业务', admin:'行政业务', jingfen:'经分业务', security:'安全终端业务', test:'测试业务' };
+const MODS = { dash:'运营看板', qa:'问题记录&知识回流', groups:'群聊&频道运营', seaf:'Seaf 运营观测' };
+/* 组织管理：组织架构同步的用户 + 4 档角色（普通用户/可访问/管理员/超级管理员）+ 业务运营平台三级权限（业务→数字人→功能模块） */
+const ROLE_LABEL = { user:'普通用户', accessible:'可访问', admin:'管理员', super_admin:'超级管理员' };
+const ORG_USERS = [
+  { u:'演示用户01', acct:'demo01@example.com', dept:'演示运营团队', path:'示例企业 / 演示运营团队', role:'super_admin', locked:true },
+  { u:'演示用户02', acct:'demo02@example.com', dept:'管理层', path:'示例企业 / 管理层', role:'super_admin', locked:true },
+  { u:'演示用户03', acct:'demo03@example.com', dept:'IT服务部', path:'示例企业 / 数字化业务部 / IT服务部', role:'admin', grants:{ it:{ it:['dash','qa','groups','seaf'] } } },
+  { u:'演示用户04', acct:'demo04@example.com', dept:'IT服务部', path:'示例企业 / 数字化业务部 / IT服务部', role:'admin', grants:{ it:{ it:['dash','qa'] } } },
+  { u:'演示用户05', acct:'demo05@example.com', dept:'IT服务部', path:'示例企业 / 数字化业务部 / IT服务部', role:'user' },
+  { u:'演示用户06', acct:'demo06@example.com', dept:'行政部', path:'示例企业 / 企业服务部 / 行政部', role:'admin', grants:{ admin:{ admin:['dash','qa','groups','seaf'] } } },
+  { u:'演示用户07', acct:'demo07@example.com', dept:'行政部', path:'示例企业 / 企业服务部 / 行政部', role:'user' },
+  { u:'演示用户08', acct:'demo08@example.com', dept:'测试业务部', path:'示例企业 / 测试业务部', role:'admin', grants:{ test:{ testA:['dash','qa','groups','seaf'], testB:['dash','qa'] } } },
+  { u:'演示用户09', acct:'demo09@example.com', dept:'安全终端部', path:'示例企业 / 安全终端部', role:'accessible', grants:{ security:{ security:['dash','qa','groups','seaf'] } } },
+  { u:'演示用户10', acct:'demo10@example.com', dept:'安全终端部', path:'示例企业 / 安全终端部', role:'user' },
+  { u:'演示用户11', acct:'demo11@example.com', dept:'经分业务部', path:'示例企业 / 经分业务部', role:'user' },
+  { u:'演示用户12', acct:'demo12@example.com', dept:'演示运营团队', path:'示例企业 / 演示运营团队', role:'admin', grants:{ it:{ it:['dash','qa'] }, admin:{ admin:['dash'] }, test:{ testA:['dash'] } } },
+];
+
+/* ══════════════ 状态 ══════════════ */
+let currentUser = 'demoUser1';
+let activeBot = 'it';
+let currentPage = 'bot-platform';
+let currentEntry = 'overview';   // overview=超管总览 / it / admin / jingfen / security
+let currentITab = 'bot-dash';
+let charts = {};
+
+/* ══════════════ 工具 ══════════════ */
+function fmt(n){ return n>=10000 ? (n/10000).toFixed(1)+'万' : n.toLocaleString() }
+function pct(n){ return (n*100).toFixed(0)+'%' }
+/* 解释性提示 → 小图标（悬停显示原文；& 与引号做 HTML 转义） */
+function tip(t){ return `<span class="info-ic" data-tip="${String(t).replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" aria-label="${String(t).replace(/&/g,'&amp;').replace(/"/g,'&quot;')}"><i data-lucide="circle-help" aria-hidden="true"></i></span>`; }
+function $(id){ return document.getElementById(id) }
+function chart(id, cfg){
+  if(charts[id]) charts[id].destroy();
+  cfg.options = Object.assign({ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ labels:{ color:'#5a6a82', boxWidth:12, boxHeight:12 } } } }, cfg.options||{});
+  charts[id] = new Chart($(id), cfg);
+  return charts[id];
+}
+/* 图表尺寸修复：隐藏容器初始化的图表宽度会错乱，切换 Tab / 窗口缩放后强制全部重算（显式传容器尺寸，无参 resize 会被 Chart.js 跳过） */
+function resizeCharts(){
+  Object.values(charts).forEach(c=>{
+    try{
+      const p = c.canvas && c.canvas.parentElement;
+      if(p) c.resize(p.clientWidth, p.clientHeight);
+    }catch(e){}
+  });
+}
+
+/* ══════════════ 用户 / 权限 ══════════════ */
+function applyUser(){
+  const u = USERS[currentUser];
+  $('uAvatar').textContent = u.avatar;
+  $('uName').innerHTML = `${u.name} <span class="user-chevron" aria-hidden="true"></span>`;
+  // 当前账号栏只展示头像和姓名，角色仍由 USERS 决定权限。
+  // 后台管理入口（组织管理、操作记录、总览）：仅超管
+  document.querySelectorAll('.admin-item').forEach(el=>el.classList.toggle('hidden', !u.super));
+  // 业务入口：按用户数字人权限显隐（该业务挂载的数字人用户有任一权限即可见）
+  document.querySelectorAll('.biz-item').forEach(el=>{
+    const need = (ENTRY_BOTS[el.dataset.entry]||[]).some(id=>u.bots.includes(id));
+    el.classList.toggle('hidden', !need);
+  });
+  if(!u.bots.length) return;
+  if(!u.bots.includes(activeBot)) activeBot = u.bots[0];
+  // 非超管：当前入口无效（总览/无权限业务）→ 跳到自己第一个业务
+  if(!u.super && (currentEntry==='overview' || !(ENTRY_BOTS[currentEntry]||[]).some(id=>u.bots.includes(id)))){
+    const firstEntry = BOT_ENTRY[u.bots[0]] || u.bots[0];
+    go('bot-platform', firstEntry);
+    return;
+  }
+  // 非超管在自己的业务入口：多数字人业务默认落总览，单数字人业务默认落运营看板
+  if(!u.super && currentPage==='bot-platform'){
+    const ids = ENTRY_BOTS[currentEntry]||[currentEntry];
+    if(ids.length>1) setITab('bot-overview'); else setITab('bot-dash');
+  }
+  // 非超管在组织管理页 → 回到平台（仅超管可进后台）
+  if(!u.super && currentPage==='legacy-org'){
+    go('bot-platform', currentEntry);
+    return;
+  }
+  renderAll();
+}
+
+function openUserModal(){
+  $('userList').innerHTML = Object.entries(USERS).map(([id,u])=>`
+    <button type="button" class="p-user-option" style="display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:10px;padding:10px 14px;cursor:pointer;background:var(--surface);${currentUser===id?'background:var(--blue-soft);border-color:var(--blue)':''}" onclick="selectUser('${id}')">
+      <div class="u-avatar" style="background:${currentUser===id?'var(--blue)':'var(--border-strong)'}">${u.avatar}</div>
+      <div style="flex:1"><div style="font-weight:700;font-size:14px">${u.name}</div><div style="font-size:12px;color:var(--muted)">${u.dept} · ${u.role}</div></div>
+      <div style="font-size:11px;color:var(--muted)">${u.bots.map(b=>BOTS[b].name).join(' / ')}</div>
+      ${currentUser===id?'<span class="pill on">当前</span>':''}
+    </button>`).join('');
+  openModal('userModal');
+}
+function openMessageCenter(){
+  alert('消息中心：你有 1 条未读消息。');
+}
+function selectUser(id){
+  currentUser = id;
+  closeModal('userModal');
+  applyUser();
+}
+
+/* ══════════════ 导航 ══════════════ */
+const CRUMBS = {
+  'legacy-overview':'运营总览', 'legacy-feedback':'内网反馈运营',
+  'legacy-knowledge':'知识库运营', 'legacy-tuitui':'推推运营',
+  'legacy-skillhub':'SkillHub 运营', 'legacy-video':'视频案例',
+  'legacy-org':'组织管理', 'legacy-opslog':'操作记录',
+  'bot-platform':'业务运营平台',
+};
+const BOT_ENTRY_CRUMBS = {
+  overview:'总览', it:'IT业务', admin:'行政业务', jingfen:'经分业务', security:'安全终端业务', test:'测试业务'
+};
+const LEGACY_PAGE_STATUS = {
+  'legacy-overview':'数字人已上线',
+  'legacy-feedback':'数字人已上线',
+  'legacy-knowledge':'数字人已上线',
+  'legacy-tuitui':'数字人已上线',
+  'legacy-skillhub':'2个数字人已上线',
+};
+function setHeaderStatus(text = '', state = '', color = ''){
+  const tag = $('crumbBotTag');
+  if(!tag) return;
+  tag.hidden = !text;
+  tag.textContent = text;
+  if(state) tag.dataset.state = state;
+  else delete tag.dataset.state;
+  if(color) tag.style.setProperty('--bot-tag-color', color);
+  else tag.style.removeProperty('--bot-tag-color');
+}
+function go(page, entry){
+  currentPage = page;
+  if(entry) currentEntry = entry;
+  document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
+  $('page-'+page).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(el=>{
+    const matchPage = el.dataset.page === page;
+    const matchEntry = !el.dataset.entry || el.dataset.entry === currentEntry;
+    el.classList.toggle('active', matchPage && matchEntry);
+  });
+  // 超管总览默认落多数字人总览；业务入口默认落运营看板，且 activeBot 跟随该业务第一个数字人
+  if(page==='bot-platform'){
+    if(currentEntry!=='overview') activeBot = (ENTRY_BOTS[currentEntry]||[currentEntry])[0];
+    const ids = currentEntry==='overview' ? USERS[currentUser].bots : (ENTRY_BOTS[currentEntry]||[currentEntry]);
+    setITab(ids.length>1 ? 'bot-overview' : 'bot-dash');
+  }
+  $('crumbs').textContent = page==='bot-platform' ? (BOT_ENTRY_CRUMBS[currentEntry] || CRUMBS[page]) : CRUMBS[page];
+  renderAll();
+}
+function setITab(tab){
+  // 只有 1 个数字人的入口没有「多数字人总览」，强制回运营看板
+  const ids = currentEntry==='overview' ? USERS[currentUser].bots : (ENTRY_BOTS[currentEntry]||[currentEntry]);
+  if(tab==='bot-overview' && ids.length<=1){ tab='bot-dash'; }
+  currentITab = tab;
+  document.querySelectorAll('.inner-tab').forEach(el=>el.classList.toggle('active', el.dataset.itab===tab));
+  document.querySelectorAll('.itab-page').forEach(el=>el.classList.remove('active'));
+  $('itab-'+tab).classList.add('active');
+  renderAll();
+  // Seaf 观测：首次激活时懒加载 iframe（避免隐藏状态下白加载）
+  if(tab==='bot-seaf'){
+    const f = $('seafFrame');
+    if(f && !f.src && f.dataset.src) f.src = f.dataset.src;
+  }
+  // 刚显示的 Tab 里图表可能是在隐藏容器中初始化的，强制重算宽度
+  requestAnimationFrame(resizeCharts);
+}
+function renderAll(){
+  renderBotTabs(); renderBots(); renderOverviewKpis(); renderOvCharts(); renderOvDash();
+  renderDashKpis(); renderDashCharts(); renderHot(); renderQA(); renderKb();
+  renderGroups(); renderConfig(); renderOrg();
+}
+
+/* ══════════════ 数字人选择条 ══════════════ */
+function renderBotTabs(){
+  const u = USERS[currentUser];
+  const el = $('botTabs'); el.innerHTML='';
+  // 当前入口的数字人列表：总览=用户全部权限数字人；业务入口=该业务挂载的数字人
+  const ids = currentEntry==='overview' ? u.bots : (ENTRY_BOTS[currentEntry]||[currentEntry]);
+  const botBar = el.closest('.bot-bar');
+  if (botBar) botBar.hidden = ids.length === 1 && currentEntry !== 'overview';
+  if(currentPage !== 'bot-platform'){
+    const legacyStatus = LEGACY_PAGE_STATUS[currentPage] || '';
+    setHeaderStatus(legacyStatus, legacyStatus ? '已上线' : '', legacyStatus ? 'var(--blue)' : '');
+  } else if (currentEntry !== 'overview' && ids.length) {
+    const bots = ids.map(id=>BOTS[id]).filter(Boolean);
+    const statuses = [...new Set(bots.map(bot=>bot.status))];
+    const status = statuses.length === 1 ? statuses[0] : '状态不一';
+    const label = bots.length === 1
+      ? `${bots[0].name}${status}`
+      : `${bots.length}个数字人${status}`;
+    setHeaderStatus(label, status, bots.length === 1 ? (bots[0].color || 'var(--blue)') : 'var(--blue)');
+  } else {
+    setHeaderStatus();
+  }
+  // 数字人多于 1 个时，最前面放「多数字人总览」
+  if(ids.length > 1){
+    const ov = document.createElement('button');
+    ov.className = 'bot-tab' + (currentITab==='bot-overview'?' active':'');
+    ov.innerHTML = '多数字人总览';
+    ov.onclick = ()=>{ setITab('bot-overview'); };
+    el.appendChild(ov);
+  }
+  ids.forEach(id=>{
+    const b = BOTS[id];
+    const t = document.createElement('button');
+    // 多数字人总览选中时，数字人一律不高亮（互斥）
+    const isActive = activeBot===id && currentITab!=='bot-overview';
+    t.className = 'bot-tab' + (isActive?' active':'');
+    t.onclick = ()=>{ activeBot=id; setITab('bot-dash'); };
+    t.innerHTML = b.name;
+    el.appendChild(t);
+  });
+  // 多数字人总览选中时隐藏第二排按钮
+  const isOverview = currentITab==='bot-overview';
+  $('innerTabs').style.display = isOverview ? 'none' : '';
+}
+
+/* ══════════════ 子页：多数字人总览 ══════════════ */
+function entryBots(){
+  // 当前入口的数字人列表（总览=用户全部；业务=该业务挂载的数字人）
+  const u = USERS[currentUser];
+  return currentEntry==='overview' ? u.bots : (ENTRY_BOTS[currentEntry]||[currentEntry]);
+}
+function renderBots(){
+  const el = $('botCards'); el.innerHTML='';
+  entryBots().forEach(id=>{
+    const b = BOTS[id];
+    const card = document.createElement('div');
+    // 总览页为纯展示，不加选中高亮（点击仍可进入该数字人运营看板）
+    card.className = 'bot-card';
+    card.onclick = ()=>{ activeBot=id; setITab('bot-dash'); };
+    card.innerHTML = `
+      <div class="b-head"><div class="bot-ico bot-avatar" style="background:${b.color}">${b.avatar?`<img src="${b.avatar}" alt="${b.name}头像">`:b.ico}</div>
+        <div><div class="b-name">${b.name}</div><div class="b-status">${b.status}</div></div>
+      </div>
+      <div class="bot-metrics">
+        <div class="bot-metric"><span>回复量</span><b>${b.msg?fmt(b.msg):'—'}</b><small>较上月 +15%</small></div>
+        <div class="bot-metric"><span>活跃用户</span><b>${b.users?fmt(b.users):'—'}</b><small>较上月 +8%</small></div>
+        <div class="bot-metric"><span>主动解决率</span><b>${b.solve?pct(b.solve):'—'}</b><small>较上月 +2%</small></div>
+      </div>`;
+    el.appendChild(card);
+  });
+  $('botSubHint').innerHTML = tip('点击卡片进入该数字人运营看板');
+}
+function renderOverviewKpis(){
+  const bots = entryBots().map(id=>BOTS[id]);
+  const active = bots.filter(b=>b.msg>0);   // 平均类指标只对有数据的数字人计算
+  const tMsg = active.reduce((s,b)=>s+b.msg,0), tUsers = active.reduce((s,b)=>s+b.users,0), tSess = active.reduce((s,b)=>s+b.sessions,0);
+  const tSolve = active.length? active.reduce((s,b)=>s+b.solve,0)/active.length : 0;
+  const tHit = active.length? active.reduce((s,b)=>s+(b.hitRate||0),0)/active.length : 0;
+  const avgTurn = tMsg && tSess ? (tMsg/tSess).toFixed(1) : '—';
+  const items = [
+    {l:'已接入数字人', v: entryBots().length+' 个', note:'当前范围数字人', trend:'+2 个', icon:'bot', tone:'blue'},
+    {l:'运行中', v: active.length+' 个', note:'当前有运营数据的数字人', trend:'+1 个', icon:'activity', tone:'green'},
+    {l:'整体回复量', v: fmt(tMsg), note:'数字人实际回复条数 · 近30天', trend:'+12%', icon:'message-square-text', tone:'purple'},
+    {l:'活跃用户', v: fmt(tUsers), note:'有问答交互的去重用户', trend:'+8%', icon:'users', tone:'cyan'},
+    {l:'主动解决率', v: tSolve?pct(tSolve):'—', note:'未转人工/未负向反馈即算解决', trend:'+3%', icon:'circle-check-big', tone:'orange'},
+  ];
+  $('overviewKpis').innerHTML = items.map(i=>`<div class="overview-kpi-item"><div class="overview-kpi-icon tone-${i.tone}" aria-hidden="true"><i data-lucide="${i.icon}"></i></div><div class="overview-kpi-content"><div class="k-label">${i.l}${i.note?tip(i.note):''}</div><div class="k-value">${i.v}</div><div class="k-trend">较上月 <span>${i.trend}</span><b aria-hidden="true">↑</b></div></div></div>`).join('');
+  window.lucide?.createIcons?.();
+}
+function renderOvCharts(){
+  const bots = entryBots().map(id=>BOTS[id]).filter(b=>b.msg>0);
+  const labels = bots.map(b=>b.name), msgs = bots.map(b=>b.msg), users = bots.map(b=>b.users);
+  if(!bots.length){ return; }
+  chart('ovMsgChart',{ type:'bar', data:{ labels, datasets:[{ label:'回复量', data:msgs, backgroundColor:'#1f5fe8', borderRadius:6 }] }, options:{ plugins:{legend:{display:false}} } });
+  chart('ovUserChart',{ type:'bar', data:{ labels, datasets:[{ label:'活跃用户', data:users, backgroundColor:'#0e8f58', borderRadius:6 }] }, options:{ plugins:{legend:{display:false}} } });
+}
+
+/* 多数字人总览 → 趋势图表（KPI 已并入上方「整体运营概况」） */
+function renderOvDash(){
+  const bots = entryBots().map(id=>BOTS[id]).filter(b=>b.msg>0);
+  // 各数字人回复量趋势（每色一条）
+  const days = 30;
+  const labels2 = Array.from({length:days},(_,i)=>`${String(Math.floor(i/30)+8).padStart(2,'0')}-${String((i%30)+1).padStart(2,'0')}`).map((d,i)=> i%5===0?d:'');
+  const colors = ['#1f5fe8','#0e8f58','#c77d0a','#7c3aed'];
+  const datasets = bots.map((b,idx)=>({
+    label: b.name, data: b.trend, borderColor: colors[idx%4], tension:.35, pointRadius:0
+  }));
+  chart('ovMsgTrend',{ type:'line', data:{ labels:labels2, datasets }, options:{ interaction:{mode:'index',intersect:false}, plugins:{legend:{position:'top',labels:{usePointStyle:true,pointStyle:'line',boxWidth:24,boxHeight:2}}}, scales:{x:{ticks:{maxRotation:0,minRotation:0}}} } });
+  // 活跃用户 / 会话数趋势（按数字人，取前2个有数据的）
+  const activeBots = bots.slice(0,2);
+  const actDatasets = [];
+  activeBots.forEach((b,idx)=>{
+    actDatasets.push({ label: b.name+'·活跃', data: b.trend.map(m=>Math.round(m*0.16)), borderColor: colors[idx], tension:.35, pointRadius:0, borderDash:[2,2] });
+    actDatasets.push({ label: b.name+'·会话', data: b.trend.map(m=>Math.round(m*0.47)), borderColor: colors[idx], borderDash:[6,3], tension:.35, pointRadius:0 });
+  });
+  chart('ovActTrend',{ type:'line', data:{ labels:labels2, datasets:actDatasets }, options:{ interaction:{mode:'index',intersect:false}, plugins:{legend:{position:'top',labels:{usePointStyle:true,pointStyle:'line',boxWidth:24,boxHeight:2}}}, scales:{x:{ticks:{maxRotation:0,minRotation:0}}} } });
+  // 热门问题 TOP10（跨当前入口数字人，模拟合并）
+  const allHot = entryBots().flatMap(id=>HOT_QA[id]||[]);
+  const merged = allHot.slice(0,10);
+  $('ovHot').innerHTML = merged.map((q,i)=>`
+    <div class="bot-card" style="padding:8px 12px;display:flex;align-items:center;gap:10px;cursor:pointer">
+      <span class="tag ${i<3?'blue':'green'}">TOP${i+1}</span>
+      <span style="flex:1;font-size:13px">${q}</span>
+      <span class="mono" style="font-size:11px;color:var(--faint)">${(500-i*22)+i*9} 次</span>
+    </div>`).join('');
+  // 各数字人知识命中率对比（总览视角：谁的知识库健康，谁的要补）
+  const hitBots = entryBots().map(id=>BOTS[id]).filter(b=>b.hitRate>0);
+  chart('ovChannel',{ type:'bar', data:{ labels:hitBots.map(b=>b.name), datasets:[{ label:'知识命中率', data:hitBots.map(b=>+(b.hitRate*100).toFixed(0)), backgroundColor:hitBots.map(b=>b.color), borderRadius:6 }] }, options:{ plugins:{legend:{display:false}}, scales:{ y:{ suggestedMax:100, ticks:{ callback:v=>v+'%' } } } } });
+}
+
+/* ══════════════ 子页：运营看板 ══════════════ */
+/* 运营看板维度联动：读取 dashRange/dashDim，返回天数与缩放系数。
+   adj = 占比/比值型指标随时间窗口的变化系数（数据库实证：知识命中率按周窗口波动 98.2%/98.0%/98.3%，非恒定值）
+   all = 累计（上线至今全量，量级按近30天约 4 倍模拟） */
+function dashCtx(){
+  const r = $('dashRange')?.value || '30d';
+  const isAll = r==='all';
+  const days = r==='7d' ? 7 : r==='90d' ? 90 : isAll ? 0 : 30;
+  const scale = isAll ? 4 : days/30;
+  const adj = days===7 ? {hit:1.012, solve:0.97, turn:0.95}
+             : days===90 ? {hit:0.99,  solve:1.04, turn:1.10}
+             : {hit:1, solve:1, turn:1};
+  return { days, scale, adj, isAll };
+}
+function renderDashKpis(){
+  const b = BOTS[activeBot];
+  const { days, scale, adj, isAll } = dashCtx();
+  const scope = isAll ? '累计' : `近${days}天`;
+  // 比值型/占比型指标随时间窗口变化（会话增长非线性 + 近期/长期问题解决率差异），非固定比值
+  const avgTurn = b.msg && b.sessions ? ((b.msg/b.sessions)*adj.turn).toFixed(1) : '—';
+  // 数字人维度（5 个）
+  const items = [
+    {l:'回复量', v: b.msg?fmt(Math.round(b.msg*scale)):'—', sub:`${scope} · 数字人实际回复条数`, c:'blue'},
+    {l:'活跃用户', v: b.users?fmt(Math.round(b.users*scale)):'—', sub:`${scope} · 有问答交互的去重用户`, c:'green'},
+    {l:'会话数', v: b.sessions?fmt(Math.round(b.sessions*scale)):'—', sub:`${scope} · 连续交互片段·30分钟切分`, c:'blue'},
+    {l:'平均问答轮次', v: avgTurn, sub:`${scope} · 回复量÷会话数`, c:'amber'},
+    {l:'主动解决率', v: b.solve?pct(Math.min(1, b.solve*adj.solve)):'—', sub:`${scope} · 未转人工/未负向反馈即算解决（占比）`, c:'green'},
+  ];
+  $('dashKpis').innerHTML = items.map(i=>`<div class="kpi" style="cursor:default"><div class="k-label">${i.l}${i.sub?tip(i.sub):''}</div><div class="k-value ${i.c}">${i.v}</div></div>`).join('');
+  renderDashKbKpis();
+  renderDashTtKpis();
+}
+/* 知识库维度 KPI（与「问题记录&知识回流」页同一口径：avgHit = 对接知识库平均命中率；知识问答数 = 同知识库总览·知识问答数量，随看板维度缩放） */
+function renderDashKbKpis(){
+  const b = BOTS[activeBot];
+  const libs = BOT_LIBS[activeBot] || [];
+  const avgHit = libs.length ? libs.reduce((s,l)=>s+l.hit,0)/libs.length : 0;
+  const { days, scale, adj, isAll } = dashCtx();
+  const scope = isAll ? '累计' : `近${days}天`;
+  const qaTotal = b.msg || 0;   // 与问题记录&知识回流页「知识问答数量」同一数据源（ai_session_chat_history）
+  $('dashKbKpis').innerHTML = [
+    {l:'知识库数量', v: libs.length+' 个', sub:'对接知识库（存量）', c:'blue'},
+    {l:'知识问答数', v: qaTotal?fmt(Math.round(qaTotal*scale)):'—', sub:`${scope} · 同问题记录&amp;知识回流`, c:'blue'},
+    {l:'知识命中率', v: avgHit?pct(Math.min(1, avgHit*adj.hit)):'—', sub:`${scope} · 问题命中知识占比`, c:'amber'},
+  ].map(i=>`<div class="kpi" style="cursor:default"><div class="k-label">${i.l}${i.sub?tip(i.sub):''}</div><div class="k-value ${i.c}">${i.v}</div></div>`).join('');
+}
+/* 推推维度 KPI（群/频道数量 + 消息数，随维度缩放） */
+function renderDashTtKpis(){
+  const groups = GROUPS[activeBot] || [];
+  const { days, scale } = dashCtx();
+  const grpCount = groups.filter(g=>!g.ch).length;
+  const chCount = groups.filter(g=>g.ch).length;
+  const msgTotal = groups.reduce((s,g)=>s+g.msg,0);
+  $('dashTtKpis').innerHTML = [
+    {l:'推推群数量', v: grpCount+' 个', sub:'监控中的推推群', c:'blue'},
+    {l:'推推频道数量', v: chCount+' 个', sub:'监控中的推推频道', c:'purple'},
+    {l:'推推消息数', v: fmt(Math.round(msgTotal*scale)), sub:`近${days}天 · 群+频道消息合计`, c:'purple'},
+  ].map(i=>`<div class="kpi" style="cursor:default"><div class="k-label">${i.l}${i.sub?tip(i.sub):''}</div><div class="k-value ${i.c}">${i.v}</div></div>`).join('');
+}
+function renderDashCharts(){
+  const b = BOTS[activeBot];
+  const msgBox = $('dashMsgTrend').parentElement;
+  if(!b.msg){
+    $('dashMsgTrend').style.display='none';
+    let hint = msgBox.querySelector('.empty-hint');
+    if(!hint){ hint=document.createElement('div'); hint.className='empty-hint'; hint.style.cssText='position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--faint)'; msgBox.appendChild(hint); msgBox.style.position='relative'; }
+    hint.textContent='该数字人暂无可展示数据（接入中）';
+    return;
+  }
+  const hint = msgBox.querySelector('.empty-hint'); if(hint) hint.remove();
+  $('dashMsgTrend').style.display='';
+  const { days, isAll } = dashCtx();
+  const dim = $('dashDim')?.value || 'day';
+  // 构造 90 天日数据（30 天原始 trend 扩展 3 段，模拟不同时段走势）
+  const raw = b.trend;
+  const daily90 = Array.from({length:90},(_,i)=>{
+    const base = raw[i%30];
+    const seg = Math.floor(i/30);
+    return Math.round(base * (1 + seg*0.06 + (i%30)*0.004));
+  });
+  // 按范围截取最近 N 天；累计 = 展示全量（近 90 天走势，量级为累计）
+  const slice = isAll ? daily90 : daily90.slice(-days);
+  // 按维度聚合：day=1天1点 / week=7天1点(求和) / month=30天1点(求和)
+  const agg = dim==='day' ? 1 : dim==='week' ? 7 : 30;
+  const n = Math.ceil(slice.length/agg);
+  const labels = [], msgs = [], users = [], sess = [];
+  for(let i=0;i<n;i++){
+    const chunk = slice.slice(i*agg, (i+1)*agg);
+    const sum = chunk.reduce((a,v)=>a+v,0);
+    const avg = sum/chunk.length;
+    msgs.push(dim==='day'? chunk[0] : Math.round(avg));
+    users.push(Math.round(avg*0.16*(1+0.15*Math.sin(i/4))));
+    sess.push(Math.round(avg*0.47*(1+0.1*Math.sin(i/5))));
+    if(dim==='day') labels.push(`${String(8+Math.floor(i/30)).padStart(2,'0')}-${String((i%30)+1).padStart(2,'0')}`);
+    else if(dim==='week') labels.push(`W${i+1}`);
+    else labels.push(`${i+1}月`);
+  }
+  chart('dashMsgTrend',{ type:'line', data:{ labels, datasets:[{ label:'回复量', data:msgs, borderColor:'#1f5fe8', backgroundColor:'rgba(31,95,232,.12)', fill:true, tension:.35, pointRadius:0 }] }, options:{ plugins:{legend:{display:false}}, interaction:{mode:'index',intersect:false} } });
+  chart('dashActTrend',{ type:'line', data:{ labels, datasets:[{ label:'活跃用户', data:users, borderColor:'#0e8f58', tension:.35, pointRadius:0 },{ label:'会话数', data:sess, borderColor:'#c77d0a', tension:.35, pointRadius:0 }] }, options:{ interaction:{mode:'index',intersect:false} } });
+  // 问题分类分布（占比型，标注时间范围）
+  const cls = CLASS_DIST[activeBot] || CLASS_DIST.it;
+  chart('dashChannel',{ type:'doughnut', data:{ labels:cls.labels, datasets:[{ data:cls.data, backgroundColor:['#1f5fe8','#0e8f58','#c77d0a','#7c3aed','#d95555','#2bb3c0'] }] }, options:{ plugins:{legend:{position:'right'}} } });
+}
+function renderHot(){
+  const qs = HOT_QA[activeBot] || [];
+  const { days, scale, isAll } = dashCtx();
+  const scope = isAll ? '累计' : `${days}天`;
+  $('dashHot').innerHTML = qs.map((q,i)=>`
+    <div class="bot-card" style="padding:8px 12px;display:flex;align-items:center;gap:10px;cursor:pointer" onclick="setITab('bot-qa')">
+      <span class="tag ${i<3?'blue':'green'}">TOP${i+1}</span>
+      <span style="flex:1;font-size:13px">${q}</span>
+      <span class="mono" style="font-size:11px;color:var(--faint)">${Math.round(((400-i*18)+i*7)*scale)} 次/${scope}</span>
+    </div>`).join('');
+}
+
+/* ══════════════ 子页：问题记录 & 知识回流 ══════════════ */
+function renderQA(){
+  const b = BOTS[activeBot];
+  const recs = QA_RECORDS[activeBot] || [];
+  const kw = ($('qaSearch')?.value||'').trim().toLowerCase();
+  const st = $('qaStatus')?.value||'';
+  const list = recs.filter(r=>(!kw||r.q.toLowerCase().includes(kw)||r.u.includes(kw)) && (!st||r.hit===st));
+  $('qaTable').innerHTML = list.length? list.map(r=>{
+    const queued = reflowQueue.some(x=>x.q===r.q);
+    const esc = r.q.replace(/'/g,"\\'");
+    return `<tr><td class="mono">${r.t}</td><td>${r.u}</td><td>${r.q}</td><td><span class="tag ${r.hit==='已命中'?'green':'warn'}">${r.hit}</span></td><td style="white-space:nowrap"><button class="btn sm" onclick="drillQADetail('${esc}')">查看</button> ${queued?'<span class="tag">已在回流队列</span>':`<button class="btn sm primary" onclick="addQAtoReflow('${esc}')">加入回流</button>`}</td></tr>`;
+  }).join('') : `<tr><td colspan="5" style="color:var(--faint);text-align:center">无匹配记录</td></tr>`;
+  $('qaCount').innerHTML = `${b.name} · 共 ${list.length} 条问答记录 ${tip('命中 = 回答引用知识库内容；未命中 = 知识库未覆盖。点击「加入回流」可把任意记录（含命中但答得不理想）加入知识回流队列，修改后回流')}`;
+}
+function drillQADetail(q){
+  $('qaModalBody').innerHTML = (QA_RECORDS[activeBot]||[]).filter(r=>r.q===q||!q).map(r=>`<tr><td class="mono">${r.t}</td><td>${r.u}</td><td>${r.q}</td><td><span class="masked">回答内容（原型脱敏）</span></td><td><span class="tag ${r.hit==='已命中'?'green':'warn'}">${r.hit}</span></td></tr>`).join('');
+  openModal('qaModal');
+}
+function drillQA(){
+  setITab('bot-qa');
+}
+/* ══════════════ 子页：问题记录 & 知识回流（块状卡片 + 知识库总览） ══════════════ */
+let qaRangeVal = 30, qaDimVal = 'day';
+/* 问题记录&知识回流页时间维度：与群聊&频道运营同款（近7/30/90天 × 按天/周/月，累计=上线至今全量），作用于知识库总览 KPI + 对接知识库。
+   adj.hit = 知识命中率随时间窗口的变化系数（数据库实证：周报口径命中率按窗口波动，非恒定值） */
+function qaCtx(){
+  const isAll = qaRangeVal===-1;
+  const r = isAll ? 0 : qaRangeVal===7 ? 7 : qaRangeVal===90 ? 90 : 30;
+  const scale = isAll ? 4 : qaRangeVal===7 ? 0.24 : qaRangeVal===90 ? 3 : 1;
+  const adj = r===7 ? {hit:1.012} : r===90 ? {hit:0.99} : {hit:1};
+  return { days:r, scale, adj, isAll };
+}
+function updateQaRange(){
+  const v = $('qaRange').value;
+  qaRangeVal = v==='all' ? -1 : parseInt(v||'30');
+  qaDimVal = $('qaDim').value||'day';
+  renderKb();
+}
+function renderKb(){
+  const b = BOTS[activeBot];
+  const libs = BOT_LIBS[activeBot] || [];
+  const pool = KB_POOL[activeBot] || [];
+  const { days, scale, adj, isAll } = qaCtx();
+  const scope = isAll ? '累计' : `近${days}天`;
+  // ① 知识库总览 KPI（5 个，数据来自 AI 知识库数据库；问答量/用户量为流量型随上方时间维度联动，库数/文档量为存量型不变；知识命中率占比型但随窗口变化）
+  const totalDocs = libs.reduce((s,l)=>s + (l.type==='faq' ? (l.items?.length||0) : l.docs), 0);
+  const avgHit = libs.length ? libs.reduce((s,l)=>s+l.hit,0)/libs.length : 0;
+  const qaTotal = b.msg || 0;         // 知识问答数量（数据库 ai_session_chat_history 可拿）
+  const qaUsers = b.users || 0;       // 知识问答用户量（user_id 去重）
+  $('kbHealth').innerHTML = [
+    {l:'知识库数量', v: libs.length+' 个', sub:'存量', c:'blue'},
+    {l:'文档量 / FAQ条目', v: fmt(totalDocs), sub:'存量', c:'green'},
+    {l:'知识问答数量', v: qaTotal?fmt(Math.round(qaTotal*scale)):'—', sub:scope, c:'blue'},
+    {l:'问答用户量', v: qaUsers?fmt(Math.round(qaUsers*scale)):'—', sub:scope, c:'green'},
+    {l:'知识命中率', v: avgHit?pct(Math.min(1, avgHit*adj.hit)):'—', sub:`${scope} · 占比型`, c:'amber'},
+  ].map(i=>`<div class="kpi" style="padding:14px 12px"><div class="k-label" style="font-size:12px">${i.l}${i.sub?tip(i.sub):''}</div><div class="k-value ${i.c}" style="font-size:22px">${i.v}</div></div>`).join('');
+  // ② 对接知识库：块状卡片（与「已接入数字人」同款风格；已加入纯展示，点击无动作）
+  const cards = libs.map(l=>`
+    <div class="bot-card" style="cursor:default">
+      <div class="b-head">
+        <div class="bot-ico" style="background:${l.type==='faq'?'#c77d0a':'#1f5fe8'}">${l.type==='faq'?'FAQ':'📄'}</div>
+        <div>
+          <div class="b-name" style="font-size:14px">${l.name}</div>
+          <div class="b-sub" style="font-size:11px;color:var(--faint)">${l.type==='faq'?'FAQ 类型':'文档类型'} · ${l.updated}</div>
+        </div>
+      </div>
+      <div class="b-row"><span>${l.type==='faq'?'问答条目':'文档数'}</span><b>${fmt(l.type==='faq' ? (l.items?.length||0) : l.docs)}</b></div>
+      <div class="b-row"><span>容量</span><b>${l.size}</b></div>
+      <div class="b-row"><span>命中率</span><b class="${l.hit>=0.85?'ok':''}" style="${l.hit<0.85?'color:var(--amber)':''}">${pct(l.hit)}</b></div>
+      <div style="margin-top:8px"><span class="tag green">已加入</span></div>
+    </div>`).join('');
+  // 「＋ 添加知识库」卡片（点击从有权限的库中选择加入）
+  const addCard = `
+    <div class="bot-card" style="border-style:dashed;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:150px;cursor:pointer" onclick="openLibPicker()">
+      <div style="width:40px;height:40px;border-radius:50%;background:var(--blue-soft);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700">＋</div>
+      <b style="font-size:13px;color:var(--blue)">添加知识库</b>
+      <span style="font-size:11px;color:var(--faint);text-align:center">从你有权限的库中选择<br>加入运营工作台</span>
+    </div>`;
+  $('kbLibCards').innerHTML = cards + addCard;
+  // ③ 未命中问题（知识库缺口 → 点击加入回流队列）
+  const miss = MISS_QA[activeBot] || [];
+  $('missQa').innerHTML = miss.length ? miss.map((q,i)=>`
+    <div class="bot-card" style="padding:8px 12px;display:flex;align-items:center;gap:10px;cursor:pointer" onclick="addMissToReflow('${q.replace(/'/g,"\\'")}')" title="点击加入回流队列">
+      <span class="tag warn">缺口</span>
+      <span style="flex:1;font-size:13px">${q}</span>
+      <span class="mono" style="font-size:11px;color:var(--faint)">${(86-i*12)} 次/周</span>
+      <button class="btn sm primary" style="pointer-events:none">加入回流</button>
+    </div>`).join('') : '<div class="hint-text" style="padding:8px">暂无未命中问题，知识库覆盖良好 🎉</div>';
+  renderReflow();
+}
+/* 添加知识库：从有权限的库池中选择（已加入的置灰不可选） */
+function openLibPicker(){
+  const libs = BOT_LIBS[activeBot] || [];
+  const pool = KB_POOL[activeBot] || [];
+  const joinedNames = new Set(libs.map(l=>l.name));
+  $('libPickerList').innerHTML = pool.map(p=>{
+    const joined = joinedNames.has(p.name);
+    return `
+      <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--surface-soft);${joined?'opacity:.55':''}">
+        <div class="bot-ico" style="width:32px;height:32px;font-size:13px;background:${p.type==='faq'?'#c77d0a':'#1f5fe8'}">${p.type==='faq'?'FAQ':'📄'}</div>
+        <div style="flex:1">
+          <b style="font-size:13px">${p.name}</b>
+          <div style="font-size:11px;color:var(--faint)">${p.type==='faq'?'问答条目':'文档'} ${fmt(p.docs)} · ${p.size} · 命中率 ${pct(p.hit)}</div>
+        </div>
+        ${joined
+          ? '<span class="tag green">已加入</span>'
+          : `<button class="btn primary sm" onclick="confirmAddLib('${p.name.replace(/'/g,"\\'")}', this)">加入</button>`}
+      </div>`;
+  }).join('');
+  openModal('libPickerModal');
+}
+function confirmAddLib(name, btn){
+  const pool = KB_POOL[activeBot] || [];
+  const p = pool.find(x=>x.name===name);
+  if(!p) return;
+  BOT_LIBS[activeBot] = BOT_LIBS[activeBot] || [];
+  BOT_LIBS[activeBot].push({
+    name:p.name, type:p.type, docs:p.docs, size:p.size, hit:p.hit, updated:'刚刚', status:'已接入',
+    files:[], items:p.type==='faq'?[]:undefined,
+  });
+  btn.closest('div[style*="display:flex"]').querySelector('.btn')?.remove();
+  const tag = document.createElement('span'); tag.className='tag green'; tag.textContent='已加入';
+  btn.closest('div[style*="display:flex"]').appendChild(tag);
+  renderKb();
+}
+/* ══════════════ 知识回流：互联网答案（自动识别） + 缺口（手动加入） → 确认 → 回流知识库 ══════════════ */
+let reflowLibIdx = 0;   // 记住选中的目标知识库（renderReflow 重建 select 后恢复）
+function renderReflow(){
+  const libs = BOT_LIBS[activeBot] || [];
+  // 目标知识库下拉
+  const sel = $('reflowLibSel');
+  const prev = parseInt(sel?.value||'0');
+  if(prev>=0 && prev<libs.length) reflowLibIdx = prev;
+  sel.innerHTML = libs.map((l,i)=>`<option value="${i}">${l.name}${l.type==='faq'?'（FAQ）':''}</option>`).join('') || '<option>暂未对接知识库</option>';
+  sel.value = String(Math.min(reflowLibIdx, Math.max(0, libs.length-1)));
+  sel.onchange = ()=>{ reflowLibIdx = parseInt(sel.value||'0'); renderReflow(); };
+  const lib = libs[reflowLibIdx];
+  $('reflowHint').setAttribute('data-tip', lib ? (lib.type==='faq' ? '选择目标知识库：目标 FAQ 型 → 回流后直接新增为问答条目' : '选择目标知识库：目标文档型 → 回流后聚合进 FAQ 文档上传') : '暂未对接知识库，请先添加知识库');
+  // 问题来源筛选（固定选项：全部来源 / 群聊 / 频道；缺口类条目始终显示，不受来源过滤）
+  const srcSel = $('reflowSrcSel');
+  srcSel.onchange = ()=>renderReflow();
+  const srcF = srcSel?.value||'';
+  // 回流队列 = 互联网答案（数字人自动识别，按来源过滤）+ 缺口/历史问答（手动加入，始终显示）
+  const net = (REFLOWS[activeBot]||[]).filter(r=>!ignoredReflows.has(r.q)).filter(r=>!srcF||r.src===srcF);
+  const gaps = reflowQueue.filter(r=>r.type==='gap');
+  const all = [...net, ...gaps];
+  $('reflowList').innerHTML = all.length ? all.map((r,i)=>{
+    const isGap = r.type==='gap';
+    const ansRow = isGap
+      ? `<div style="margin-top:6px;display:flex;gap:8px;align-items:center">
+          <span style="font-size:12px;color:var(--amber);font-weight:600">待补答案：</span>
+          <input id="reflowAns${i}" type="text" placeholder="填写答案内容…" style="flex:1;font-size:13px">
+        </div>`
+      : `<div style="margin-top:6px;font-size:12px;color:var(--muted);padding-left:12px;border-left:2px solid var(--blue)" data-reflow-ans="1">🌐 来自互联网的答案：${r.a}</div>`;
+    return `
+      <div style="border:1px solid var(--border);border-radius:10px;padding:10px 14px;background:var(--surface-soft)" data-gap="${isGap?'1':'0'}">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <input type="checkbox" class="rc-chk" data-i="${i}" onchange="updateReflowSel()" style="flex:none">
+          <span class="tag ${isGap?'warn':'blue'}">${isGap?'缺口':('来自互联网 · '+r.src)}</span>
+          <b style="font-size:13px">${r.q}</b>
+          <span style="margin-left:auto;font-size:11px;color:var(--faint)">${r.group} · ${r.t} · ${r.who}</span>
+          <button class="btn primary sm" onclick="confirmReflow(this, ${i}, ${isGap})">回流</button>
+          ${isGap?'':`<button class="btn sm" onclick="editReflowAnswer(this)">✏️ 编辑</button>`}
+          <button class="btn sm" onclick="removeReflowItem(this, '${r.q.replace(/'/g,"\\'")}', ${isGap})">忽略</button>
+        </div>
+        ${ansRow}
+      </div>`;
+  }).join('') : '<div class="hint-text" style="padding:8px">暂无待回流内容 🎉</div>';
+  updateReflowSel();
+}
+/* 忽略回流项：缺口/历史问答从队列移除；互联网答案记录忽略状态（切数字人后不再出现） */
+function removeReflowItem(btn, q, isGap){
+  if(isGap){
+    const qi = reflowQueue.findIndex(x=>x.q===q);
+    if(qi>=0) reflowQueue.splice(qi,1);
+  } else {
+    ignoredReflows.add(q);
+  }
+  const card = btn.closest('div[data-gap]');
+  if(card) card.remove();
+  updateReflowSel();
+}
+/* 编辑互联网答案：答案区切换为可编辑 textarea，保存后恢复展示（管理员可修改后回流） */
+function editReflowAnswer(btn){
+  const card = btn.closest('[data-gap]');
+  const ansBox = card.querySelector('[data-reflow-ans]');
+  if(!ansBox) return;
+  const cur = ansBox.textContent.replace('🌐 来自互联网的答案：','').trim();
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'margin-top:6px;display:flex;gap:8px;align-items:flex-start';
+  wrap.setAttribute('data-reflow-edit','1');
+  wrap.innerHTML = `<span style="font-size:12px;color:var(--blue);font-weight:600;flex:none;padding-top:6px">编辑答案：</span>
+    <textarea style="flex:1;font-size:13px;min-height:64px;resize:vertical;font-family:inherit" placeholder="修改答案内容…">${cur.replace(/&/g,'&amp;').replace(/</g,'&lt;')}</textarea>`;
+  ansBox.replaceWith(wrap);
+  btn.textContent = '保存';
+  btn.classList.add('primary');
+  btn.onclick = ()=>saveReflowAnswer(btn);
+  const ta = wrap.querySelector('textarea');
+  if(ta){ ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); }
+}
+function saveReflowAnswer(btn){
+  const card = btn.closest('[data-gap]');
+  const ta = card.querySelector('textarea');
+  const v = ta ? ta.value.trim() : '';
+  if(!v){ alert('答案不能为空'); return; }
+  const wrap = ta.closest('[data-reflow-edit]');
+  const box = document.createElement('div');
+  box.style.cssText = 'margin-top:6px;font-size:12px;color:var(--muted);padding-left:12px;border-left:2px solid var(--blue)';
+  box.setAttribute('data-reflow-ans','1');
+  box.textContent = '🌐 来自互联网的答案：' + v;
+  wrap.replaceWith(box);
+  btn.textContent = '✏️ 编辑';
+  btn.classList.remove('primary');
+  btn.onclick = ()=>editReflowAnswer(btn);
+}
+function updateReflowSel(){
+  const n = document.querySelectorAll('#reflowList .rc-chk:checked').length;
+  const c = $('reflowSelCount'); if(c) c.textContent = n;
+  const all = $('reflowSelAll');
+  if(all){
+    const total = document.querySelectorAll('#reflowList .rc-chk').length;
+    all.checked = total>0 && n===total;
+    all.indeterminate = n>0 && n<total;
+  }
+}
+function toggleReflowAll(el){
+  document.querySelectorAll('#reflowList .rc-chk').forEach(c=>c.checked = el.checked);
+  updateReflowSel();
+}
+/* 单条回流 */
+function confirmReflow(btn, i, isGap){
+  const card = btn.closest('[data-gap]');
+  const res = doReflow(card, i, isGap);
+  if(!res.ok){ alert(res.msg); return; }
+  card.innerHTML = `<div style="color:var(--green);font-size:13px;font-weight:600">✓ 已回流到「${res.lib.name}」${res.lib.type==='faq'?'（新增问答条目）':'（聚合进 FAQ 文档）'} · ${res.q}</div>`;
+  renderKb();
+}
+/* 批量回流：勾选多条一键回流 */
+function batchReflow(){
+  const cards = [...document.querySelectorAll('#reflowList .rc-chk:checked')].map(c=>c.closest('[data-gap]'));
+  if(!cards.length){ alert('请先勾选要回流的记录（可点「全选」）'); return; }
+  let ok = 0, skip = [];
+  cards.forEach(card=>{
+    const i = parseInt(card.querySelector('.rc-chk').dataset.i);
+    const isGap = card.dataset.gap==='1';
+    const res = doReflow(card, i, isGap);
+    if(res.ok){
+      card.innerHTML = `<div style="color:var(--green);font-size:13px;font-weight:600">✓ 已回流到「${res.lib.name}」${res.lib.type==='faq'?'（新增问答条目）':'（聚合进 FAQ 文档）'} · ${res.q}</div>`;
+      ok++;
+    } else skip.push(res.msg);
+  });
+  if(skip.length) alert(`有 ${skip.length} 条未回流：${skip[0]}`);
+  if(ok) renderKb();
+}
+/* 回流核心：读取记录 → 写入目标知识库 → 从队列移除 */
+function doReflow(card, i, isGap){
+  const libs = BOT_LIBS[activeBot] || [];
+  const lib = libs[reflowLibIdx];
+  const q = card.querySelector('b').textContent;
+  let a;
+  if(isGap){
+    const inp = document.getElementById(`reflowAns${i}`);
+    a = inp ? inp.value.trim() : '';
+    if(!a) return { ok:false, msg:'「'+q.slice(0,18)+'…」请先填写答案内容' };
+    const qi = reflowQueue.findIndex(x=>x.q===q);
+    if(qi>=0) reflowQueue.splice(qi,1);
+  } else {
+    // 优先读编辑中的 textarea；否则读答案展示块
+    const ta = card.querySelector('textarea');
+    a = ta ? ta.value.trim() : card.querySelector('[data-reflow-ans]').textContent.replace('🌐 来自互联网的答案：','').trim();
+  }
+  if(lib){
+    if(lib.type==='faq'){
+      lib.items = lib.items||[];
+      lib.items.unshift({ q, a, src:'人工回流·'+(isGap?'缺口':'互联网'), st:'已上线' });
+    } else {
+      const faq = lib.files.find(f=>f.n.includes('高频问题FAQ'));
+      if(faq){ faq.t='刚刚'; faq.st='解析中'; }
+      else { lib.docs += 1; lib.files.unshift({ n:'高频问题FAQ.docx', s:'0.3MB', t:'刚刚', st:'解析中' }); }
+    }
+  }
+  return { ok:true, lib, q };
+}
+function openAIExtract(){
+  // 知识库下拉（当前数字人的知识库）
+  const libs = BOT_LIBS[activeBot] || [];
+  $('aiLibSel').innerHTML = libs.map((l,i)=>`<option value="${i}">${l.name}</option>`).join('') || '<option>暂未对接知识库</option>';
+  // AI 聚合的 FAQ 文档草稿：已有同主题 → 更新原文档；无 → 新建（内容为问答对：问题+答案）
+  $('aiDocs').innerHTML = [
+    { name:'账号权限类高频问题FAQ', tag:'来源于历史问答 + 工单', mode:'update', ver:'v3 → v4', add:3, items:[
+      { q:'如何批量重置部门内多名员工的 VPN？', a:'管理员在 VPN 管理后台 → 用户管理 → 勾选目标用户 → 批量重置，重置后用户需重新登录。' },
+      { q:'VPN 登录后无法访问内网特定系统？', a:'检查该系统的内网权限组是否包含当前账号，未包含则走内网权限申请流程（见知识库对应文档）。' },
+      { q:'如何找回被锁定的账号？', a:'账号因多次输错密码被锁定，等待 30 分钟自动解锁；紧急情况联系 IT 服务台人工解锁。' },
+    ]},
+    { name:'硬件设备类高频问题FAQ', tag:'来源于工单系统', mode:'new', ver:'新建', add:2, items:[
+      { q:'打印机驱动安装后仍无法连接？', a:'确认打印机 IP 与本机同网段，重新安装官方驱动；若仍失败，检查打印服务（Print Spooler）是否启动。' },
+      { q:'旧电脑数据迁移到新电脑怎么操作？', a:'使用公司统一的 OneDrive/云盘备份桌面与文档目录，新电脑登录后同步；特殊软件联系 IT 迁移授权。' },
+    ]},
+  ].map(d=>renderAIDoc(d)).join('');
+  openModal('aiModal');
+}
+function renderAIDoc(d){
+  return `
+    <div style="border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--surface-soft)" data-docname="${d.name}" data-mode="${d.mode}">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+        <span class="tag blue">AI 草稿</span>
+        <b style="font-size:14px">📄 ${d.name}.docx</b>
+        <span class="tag ${d.mode==='update'?'green':'warn'}">${d.mode==='update'?'更新已有文档':'新建文档'}</span>
+        <span class="hint-text">${d.mode==='update'?'版本 '+d.ver+' · 新增 '+d.add+' 条':'首次创建 · 含 '+d.add+' 条'}</span>
+        <span style="margin-left:auto;display:flex;gap:6px">
+          <button class="btn sm" onclick="editAIDoc(this)">✏️ 编辑</button>
+          <button class="btn sm" onclick="this.closest('[data-docname]').remove()">删除</button>
+        </span>
+      </div>
+      <div style="font-size:13px;color:var(--muted)">${d.tag} · 内容预览（问答对）：</div>
+      ${d.items.map((it,i)=>`
+        <div style="margin-top:6px;padding-left:12px;border-left:2px solid var(--border-strong)">
+          <div style="font-size:12px;font-weight:700;color:var(--text)">Q${i+1}. ${it.q}</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px">A. ${it.a}</div>
+        </div>`).join('')}
+    </div>`;
+}
+function editAIDoc(btn){
+  const card = btn.closest('[data-docname]');
+  const name = card.dataset.docname;
+  const items = [...card.querySelectorAll('div[style*="padding-left:12px"]')].map(e=>{
+    const q = e.querySelector('div[style*="font-weight:700"]')?.textContent.replace(/^Q\d+\.\s*/,'') || '';
+    const a = e.querySelector('div[style*="color:var(--muted)"]')?.textContent.replace(/^A\.\s*/,'') || '';
+    return { q, a };
+  });
+  // 编辑发生在「内容层」：直接编辑问答清单文本，AI 再据此重新生成/更新文档（无需在线编辑引擎）
+  card.innerHTML = `
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+      <span class="tag blue">编辑内容</span>
+      <b style="font-size:14px">📄 ${name}.docx</b>
+      <span class="hint-text">编辑问答对（问题+答案），保存后 AI 据此重新生成文档内容</span>
+      <span style="margin-left:auto;display:flex;gap:6px">
+        <button class="btn primary sm" onclick="saveAIDoc(this)">保存</button>
+        <button class="btn sm" onclick="openAIExtract()">取消</button>
+      </span>
+    </div>
+    <div id="editItems" style="display:grid;gap:8px">
+      ${items.map((it,i)=>`
+        <div style="border:1px solid var(--border);border-radius:8px;padding:8px 10px">
+          <div style="display:flex;gap:6px;align-items:center;margin-bottom:4px">
+            <span style="font-size:12px;color:var(--faint);font-weight:700">Q${i+1}</span>
+            <input type="text" value="${it.q}" placeholder="问题…" style="flex:1;font-size:13px">
+            <button class="btn sm" onclick="this.closest('div[style*=\"border:1px\"]').remove()">×</button>
+          </div>
+          <div style="display:flex;gap:6px;align-items:center">
+            <span style="font-size:12px;color:var(--faint);font-weight:700">A</span>
+            <input type="text" value="${it.a}" placeholder="答案…" style="flex:1;font-size:13px">
+          </div>
+        </div>`).join('')}
+    </div>
+    <div style="margin-top:8px;display:flex;gap:8px">
+      <button class="btn sm ghost" onclick="addEditItem(this)">＋ 添加问答对</button>
+      <span class="hint-text">保存后：${items.length} 条问答 → 由 AI 生成文档内容（覆盖/新建）</span>
+    </div>`;
+}
+function addEditItem(btn){
+  const wrap = btn.closest('[data-docname]') ? btn.closest('[data-docname]') : btn.parentElement.parentElement;
+  const list = wrap.querySelector('#editItems');
+  if(!list) return;
+  const n = list.children.length + 1;
+  const row = document.createElement('div');
+  row.style.cssText = 'border:1px solid var(--border);border-radius:8px;padding:8px 10px';
+  row.innerHTML = `
+    <div style="display:flex;gap:6px;align-items:center;margin-bottom:4px">
+      <span style="font-size:12px;color:var(--faint);font-weight:700">Q${n}</span>
+      <input type="text" placeholder="问题…" style="flex:1;font-size:13px">
+      <button class="btn sm" onclick="this.closest('div[style*="border:1px"]').remove()">×</button>
+    </div>
+    <div style="display:flex;gap:6px;align-items:center">
+      <span style="font-size:12px;color:var(--faint);font-weight:700">A</span>
+      <input type="text" placeholder="答案…" style="flex:1;font-size:13px">
+    </div>`;
+  list.appendChild(row);
+}
+function saveAIDoc(btn){
+  const card = btn.closest('[data-docname]');
+  const name = card.dataset.docname;
+  const mode = card.dataset.mode || 'new';
+  // 收集问答对（问题+答案）：每块内第 1 个 input=问题，第 2 个=答案
+  const blocks = [...card.querySelectorAll('#editItems > div')];
+  const items = blocks.map(b=>{
+    const ins = b.querySelectorAll('input');
+    return { q: (ins[0]?.value||'').trim(), a: (ins[1]?.value||'').trim() };
+  }).filter(it=>it.q);
+  // 保存后：回到预览态，标记「已编辑待上传」
+  card.outerHTML = renderAIDoc({ name, tag:'已按编辑内容重新生成', mode, ver: mode==='update'?'v3 → v4（已编辑）':'新建（已编辑）', add: items.length, items });
+  const newCard = [...document.querySelectorAll('#aiDocs [data-docname]')].find(c=>c.dataset.docname===name);
+  if(newCard){
+    const tag = newCard.querySelector('.tag.blue');
+    tag.textContent = '已编辑';
+  }
+}
+function confirmAIChip(btn){
+  // 原型示意：确认上传 → 更新模式的替换原文档，新建模式的加入文档列表
+  const libIdx = parseInt($('aiLibSel').value||'0');
+  const libs = BOT_LIBS[activeBot] || [];
+  const lib = libs[libIdx];
+  // 有任一草稿是「更新已有文档」模式 → 更新；全新建 → 新建
+  const hasUpdate = [...document.querySelectorAll('#aiDocs [data-docname]')].some(c=>c.dataset.mode==='update');
+  const mode = hasUpdate ? 'update' : 'new';
+  // 更新模式：替换库内已有同主题 FAQ 文档（文档数不变）；新建模式：文档数+1
+  if(lib){
+    const existing = lib.files.find(f=>f.n.includes('高频问题FAQ'));
+    if(existing){ existing.t = '刚刚'; existing.st = '解析中'; existing.ver = (existing.ver||1)+1; }
+    else { lib.docs += 1; lib.files.unshift({ n:'高频问题FAQ.docx', s:'0.3MB', t:'刚刚', st:'解析中', ver:1 }); }
+    renderKb();
+  }
+  btn.closest('.modal').querySelector('.m-head').innerHTML = '<b>✓ 已'+(mode==='update'?'更新':'上传')+'知识库（解析中）</b><button class="xbtn" onclick="closeModal(\'aiModal\')">×</button>';
+  const sel = btn.closest('.modal').querySelector('#aiDocs');
+  if(sel) sel.innerHTML = '<div class="notice" style="margin:8px 0">'+(mode==='update'?'已覆盖更新原文档，进入「解析中」，完成后用户提问即可命中最新内容。':'已上传新文档，进入「解析中」，约 1-2 分钟后自动完成向量化 → 用户提问即可命中。')+'</div>';
+}
+function openKbAdd(){ alert('原型示意：上传文档（拖拽/选择文件）→ 自动向量化解析'); }
+
+/* ══════════════ 子页：群聊 & 频道运营（推推群/频道卡片 + 消息趋势） ══════════════ */
+let grpRangeVal = 30, grpDimVal = 'day';
+function renderGroups(){
+  const b = BOTS[activeBot];
+  const groups = GROUPS[activeBot] || [];
+  const isAll = grpRangeVal===-1;
+  // ① 推推总览 KPI（4 个：群/频道数量分开，消息也分开；随全局时间维度联动；累计=上线至今全量）
+  const groupsCount = groups.filter(g=>!g.ch).length;
+  const channelsCount = groups.filter(g=>g.ch).length;
+  const msgGroup = groups.filter(g=>!g.ch).reduce((s,g)=>s+g.msg,0);
+  const msgChannel = groups.filter(g=>g.ch).reduce((s,g)=>s+g.msg,0);
+  const scale = isAll ? 4 : grpRangeVal===7 ? 0.24 : grpRangeVal===90 ? 3 : 1;
+  const scope = isAll ? '累计' : (grpRangeVal===7?'近7日':grpRangeVal===90?'近90日':'近30日');
+  $('grpKpis').innerHTML = [
+    {l:'监控推推群数量', v: groupsCount+' 个', c:'blue', tip:'纳入监控的推推群数量（存量）'},
+    {l:'监控推推频道数量', v: channelsCount+' 个', c:'purple', tip:'纳入监控的推推频道数量（存量）'},
+    {l:'推推群消息', v: fmt(Math.round(msgGroup*scale)), c:'blue', tip:`${scope}推推群消息合计 · 随上方时间维度联动`},
+    {l:'频道消息', v: fmt(Math.round(msgChannel*scale)), c:'purple', tip:`${scope}推推频道消息合计 · 随上方时间维度联动`},
+  ].map(i=>`<div class="kpi" style="padding:14px 12px"><div class="k-label" style="font-size:12px">${i.l}${i.tip?tip(i.tip):''}</div><div class="k-value ${i.c}" style="font-size:22px">${i.v}</div></div>`).join('');
+  // ② 推推群/频道卡片（样式与「对接知识库」一致；含活跃度口径）
+  const cards = groups.map(g=>`
+    <div class="bot-card" style="cursor:default">
+      <div class="b-head">
+        <div class="bot-ico grp-type-ico ${g.ch?'channel':'group'}">${g.ch?'频':'群'}</div>
+        <div>
+          <div class="b-name" style="font-size:14px">${g.n}</div>
+          <div class="b-sub" style="font-size:11px;color:var(--faint)">${g.ch?'推推频道':'推推群'} · ${g.m} 成员</div>
+        </div>
+      </div>
+      <div class="b-row"><span>成员数</span><b>${fmt(g.m)}</b></div>
+      <div class="b-row"><span>${scope}消息</span><b>${fmt(Math.round(g.msg*scale))}</b></div>
+      <div class="b-row"><span>活跃度</span><b>${g.act}</b></div>
+      <div style="margin-top:8px"><span class="tag green">已监控</span></div>
+    </div>`).join('');
+  const addCard = `
+    <div class="bot-card grp-add-card" style="border-style:dashed;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:150px;cursor:pointer" onclick="openGroupPicker()">
+      <div class="grp-add-icon">＋</div>
+      <b class="grp-add-title">添加推推群/频道</b>
+      <span style="font-size:11px;color:var(--faint);text-align:center">从你有权限的群/频道中<br>选择加入运营监控</span>
+    </div>`;
+  $('grpCards').innerHTML = cards + addCard;
+  // ③ 消息量：推推群 / 推推频道 分开展示（各群/各频道消息量柱状图；无数据时显示空提示）
+  const groupList = groups.filter(g=>!g.ch), channelList = groups.filter(g=>g.ch);
+  renderGroupMsgChart('grpGroupCanvas','grpGroupBox','暂无添加的推推群', groupList, scale, scope, '各推推群的消息量');
+  renderGroupMsgChart('grpChannelCanvas','grpChannelBox','暂无添加的推推频道', channelList, scale, scope, '各推推频道的消息量');
+}
+/* 群/频道消息趋势图：每个群/频道一条随时间变化的趋势线（x轴=时间，随按天/周/月 × 近7/30/90天/累计联动）；无数据时显示空提示 */
+function renderGroupMsgChart(canvasId, boxId, emptyText, list, scale, scope, tipText){
+  const box = $(boxId);
+  const card = box.closest('.card');
+  const ic = card ? card.querySelector('.card-title .info-ic') : null;
+  if(ic) ic.setAttribute('data-tip', `${tipText}（${scope}）· 每条线 = 一个群/频道 · 随上方时间维度联动`);
+  if(!list.length){
+    if(charts[canvasId]){ charts[canvasId].destroy(); delete charts[canvasId]; }
+    box.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--faint);font-size:13px">${emptyText}</div>`;
+    return;
+  }
+  // 时间轴：7天→7点 / 30天→30点 / 90天与累计→12点聚合
+  const n = grpRangeVal===7 ? 7 : grpRangeVal===30 ? 30 : 12;
+  const labels = [];
+  for(let i=0;i<n;i++){
+    if(grpDimVal==='day') labels.push(`${String(8+Math.floor(i/30)).padStart(2,'0')}-${String((i%30)+1).padStart(2,'0')}`);
+    else if(grpDimVal==='week') labels.push(`W${i+1}`);
+    else labels.push(`${i+1}月`);
+  }
+  const css = getComputedStyle(document.documentElement);
+  const colors = ['--chart-1','--chart-2','--chart-3','--chart-4','--chart-5','--chart-6']
+    .map(token => css.getPropertyValue(token).trim());
+  const muted = css.getPropertyValue('--muted').trim();
+  const datasets = list.map((g,idx)=>{
+    const base = g.msg * scale / n;
+    return {
+      label: g.n,
+      data: Array.from({length:n},(_,i)=> Math.max(1, Math.round(base*(0.7+0.6*Math.abs(Math.sin(i*1.3+idx*1.9)))))),
+      borderColor: colors[idx%colors.length], backgroundColor: colors[idx%colors.length]+'22',
+      tension:.35, pointRadius:0, borderWidth:2,
+    };
+  });
+  box.innerHTML = `<canvas id="${canvasId}"></canvas>`;
+  chart(canvasId,{ type:'line', data:{ labels, datasets }, options:{ interaction:{mode:'index',intersect:false}, plugins:{legend:{position:'top',labels:{color:muted}}}, scales:{ x:{ticks:{color:muted},grid:{color:muted+'22'}}, y:{ beginAtZero:true, ticks:{color:muted},grid:{color:muted+'22'}, title:{display:true,text:'消息量（条）',color:muted} } } } });
+}
+function updateGroupRange(){
+  const v = $('grpRange').value;
+  grpRangeVal = v==='all' ? -1 : parseInt(v||'30');
+  grpDimVal = $('grpDim').value||'day';
+  renderGroups();
+}
+/* 添加推推群/频道（原型示意：从有权限的群列表中选择） */
+function openGroupPicker(){
+  const groups = GROUPS[activeBot] || [];
+  const pool = GROUPS_POOL[activeBot] || [];
+  const joined = new Set(groups.map(g=>g.n));
+  $('grpPickerList').innerHTML = pool.map(g=>{
+    const has = joined.has(g.n);
+    return `
+      <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--surface-soft);${has?'opacity:.55':''}">
+        <div class="bot-ico" style="width:32px;height:32px;font-size:13px;background:${g.ch?'#7c3aed':'#0e8f58'}">${g.ch?'频':'群'}</div>
+        <div style="flex:1">
+          <b style="font-size:13px">${g.n}</b>
+          <div style="font-size:11px;color:var(--faint)">${g.ch?'推推频道':'推推群'} · ${fmt(g.m)} 成员 · ${fmt(g.msg)} 条消息</div>
+        </div>
+        ${has ? '<span class="tag green">已监控</span>' : `<button class="btn primary sm" onclick="confirmAddGroup('${g.n.replace(/'/g,"\\'")}', this)">加入</button>`}
+      </div>`;
+  }).join('');
+  openModal('grpPickerModal');
+}
+function confirmAddGroup(name, btn){
+  const pool = GROUPS_POOL[activeBot] || [];
+  const g = pool.find(x=>x.n===name);
+  if(!g) return;
+  GROUPS[activeBot] = GROUPS[activeBot] || [];
+  GROUPS[activeBot].push({ n:g.n, m:g.m, msg:g.msg, act:'中', ch:g.ch });
+  btn.closest('div[style*="display:flex"]').querySelector('.btn')?.remove();
+  const tag = document.createElement('span'); tag.className='tag green'; tag.textContent='已监控';
+  btn.closest('div[style*="display:flex"]').appendChild(tag);
+  renderGroups();
+}
+/* ══════════════ 运营报告（周报/月报，可选择具体周期，限回溯期限） ══════════════ */
+let reportType = 'week';
+// 周报可选范围：最近 8 周（2026-W29 ~ W36，当前 2026-09-03 所在周为 W36）
+const REPORT_WEEKS = [
+  {v:'2026-W36', l:'2026年 第36周（08.31 - 09.06）'},
+  {v:'2026-W35', l:'2026年 第35周（08.24 - 08.30）'},
+  {v:'2026-W34', l:'2026年 第34周（08.17 - 08.23）'},
+  {v:'2026-W33', l:'2026年 第33周（08.10 - 08.16）'},
+  {v:'2026-W32', l:'2026年 第32周（08.03 - 08.09）'},
+  {v:'2026-W31', l:'2026年 第31周（07.27 - 08.02）'},
+  {v:'2026-W30', l:'2026年 第30周（07.20 - 07.26）'},
+  {v:'2026-W29', l:'2026年 第29周（07.13 - 07.19）'},
+];
+// 月报可选范围：最近 6 个月
+const REPORT_MONTHS = [
+  {v:'2026-09', l:'2026年 9月'},
+  {v:'2026-08', l:'2026年 8月'},
+  {v:'2026-07', l:'2026年 7月'},
+  {v:'2026-06', l:'2026年 6月'},
+  {v:'2026-05', l:'2026年 5月'},
+  {v:'2026-04', l:'2026年 4月'},
+];
+function setReportType(t){
+  reportType = t;
+  document.querySelectorAll('#reportTypeSeg .seg-btn').forEach(b=>b.classList.toggle('active', b.dataset.rt===t));
+  renderReportPeriod();
+}
+function renderReportPeriod(){
+  const list = reportType==='week' ? REPORT_WEEKS : REPORT_MONTHS;
+  $('reportPeriod').innerHTML = list.map(x=>`<option value="${x.v}">${x.l}</option>`).join('');
+  $('reportLimitHint').innerHTML = tip(reportType==='week' ? '周报支持最近 8 周（更早数据超出回溯期限，不提供导出）' : '月报支持最近 6 个月（更早数据超出回溯期限，不提供导出）');
+}
+function openReportConfig(){
+  renderReportPeriod();
+  openModal('reportConfigModal');
+}
+function genReport(){
+  const b = BOTS[activeBot];
+  const periodVal = $('reportPeriod')?.value || '2026-W36';
+  const isMonth = reportType==='month';
+  const periodName = isMonth ? '月报' : '周报';
+  // 选中的周期标签（如"2026年 第36周（08.31-09.06）"或"2026年 9月"）
+  const list = isMonth ? REPORT_MONTHS : REPORT_WEEKS;
+  const picked = list.find(x=>x.v===periodVal) || list[0];
+  const days = isMonth ? 30 : 7;
+  const groups = GROUPS[activeBot] || [];
+  const grpMsg = groups.reduce((s,g)=>s+g.msg,0);
+  const libs = BOT_LIBS[activeBot] || [];
+  const libMsg = libs.length ? libs.reduce((s,l)=>s + (l.type==='faq' ? (l.items?.length||0) : l.docs), 0) : 0;
+  const missN = (MISS_QA[activeBot]||[]).length;
+  closeModal('reportConfigModal');
+  openModal('reportModal');
+  $('reportBody').innerHTML = `
+    <div class="flow">
+      <div class="step done">① AI 起草</div><div class="arrow">→</div>
+      <div class="step">② 业务确认</div><div class="arrow">→</div>
+      <div class="step">③ 落库 / 发布</div>
+    </div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:10px">报告对象：<strong>${b.name} 整体运营</strong> · 周期：<strong>${picked.l}</strong> · 生成时间：2026-09-02</div>
+    <div style="border:1px solid var(--border);border-radius:10px;padding:14px;background:var(--surface-soft)">
+      <h4 style="margin-bottom:8px">${b.name} 运营${periodName}（${picked.v} · AI 草稿 · 待确认）</h4>
+      <p style="margin-bottom:6px;font-weight:700">一、问答运营</p>
+      <p style="margin-bottom:6px;padding-left:12px">· ${isMonth?'本月':'本周'}回复量 <strong>${fmt(Math.round(b.msg/days*7))}</strong> 条（数字人实际回复），环比 <span class="up" style="color:var(--bad);font-weight:700">↑ 8.4%</span>；活跃用户 <strong>${fmt(Math.round(b.users/days*7))}</strong> 人，会话 <strong>${fmt(Math.round(b.sessions/days*7))}</strong> 次；</p>
+      <p style="margin-bottom:6px;padding-left:12px">· 主动解决率 <strong>${pct(b.solve)}</strong>（未转人工/未负向反馈即算解决）；热门问题：VPN 密码重置 / 账号锁定 / 内网权限申请（合计占 38%）。</p>
+      <p style="margin-bottom:6px;font-weight:700">二、知识库运营</p>
+      <p style="margin-bottom:6px;padding-left:12px">· 对接知识库 <strong>${libs.length}</strong> 个，内容量 <strong>${fmt(libMsg)}</strong>，整体知识命中率 <strong>${libs.length?pct(libs.reduce((s,l)=>s+l.hit,0)/libs.length):'—'}</strong>；</p>
+      <p style="margin-bottom:6px;padding-left:12px">· 未命中问题 <strong>${missN}</strong> 条待回流，${isMonth?'本月':'本周'}已回流补录 <strong>3</strong> 条。</p>
+      <p style="margin-bottom:6px;font-weight:700">三、群聊 &amp; 频道运营</p>
+      <p style="margin-bottom:6px;padding-left:12px">· 监控推推群 <strong>${groups.filter(g=>!g.ch).length}</strong> 个 / 频道 <strong>${groups.filter(g=>g.ch).length}</strong> 个，${isMonth?'本月':'本周'}消息 <strong>${fmt(grpMsg)}</strong> 条。</p>
+      <p style="margin-bottom:6px;font-weight:700">四、运营建议</p>
+      <p style="padding-left:12px">· 将「打印机驱动」类工单纳入知识库回流，可再提升主动解决率约 2pct；未命中问题优先补录（见知识回流）。</p>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:14px">
+      <button class="btn primary" onclick="confirmReport(this)">确认并落库</button>
+      <button class="btn">改草稿</button>
+      <button class="btn ghost">另存为模板</button>
+      <span class="hint-text" style="margin-left:auto">铁律：AI 只起草，结论与拍板归业务</span>
+    </div>`;
+}
+function confirmReport(btn){
+  btn.textContent='✓ 已落库'; btn.disabled=true;
+}
+
+/* ══════════════ 组织管理（后台，超管） ══════════════ */
+function renderConfig(){
+  // ① 数字人接入管理：通用配置（所属业务 / 同步频率；数据源自动拉取，开放范围=所属业务）
+  const kw = ($('botConfigSearch')?.value||'').trim().toLowerCase();
+  const sf = $('botConfigStatus')?.value||'';
+  const bots = Object.values(BOTS).filter(b=>{
+    const entry = BOT_ENTRY[b.id];
+    return (!kw || b.name.toLowerCase().includes(kw) || (ENTRY_NAME[entry]||'').toLowerCase().includes(kw)) && (!sf || b.status===sf);
+  });
+  $('cfgBotTable').innerHTML = bots.map(b=>{
+    const entry = BOT_ENTRY[b.id];
+    return `<tr><td><b>${b.name}</b></td>
+      <td><span class="tag blue">${ENTRY_NAME[entry]||'—'}</span></td>
+      <td><span class="tag ${b.msg?'green':''}">${b.status}</span></td>
+      <td>${b.msg?'每 5 分钟':'—'}</td>
+      <td style="white-space:nowrap"><button class="btn sm" onclick="alert('原型示意：编辑数字人配置（名称 / 所属业务 / 同步频率）')">编辑</button></td></tr>`;
+  }).join('');
+}
+/* ── 组织管理：架构同步 + 4 档角色 + 业务运营平台三级权限（融入） ── */
+let orgSelRows = new Set();
+function renderOrgDepts(){
+  const depts = [...new Set(ORG_USERS.map(u=>u.dept))];
+  $('orgDeptFilter').innerHTML = '<option value="">全部部门</option>' + depts.map(d=>`<option>${d}</option>`).join('');
+}
+function renderOrg(){
+  const kw = ($('orgSearch')?.value||'').trim().toLowerCase();
+  const df = $('orgDeptFilter')?.value||'';
+  const rf = $('orgRoleFilter')?.value||'';
+  const list = ORG_USERS.filter(u=>
+    (!kw || u.u.toLowerCase().includes(kw) || (u.acct||'').toLowerCase().includes(kw) || u.dept.toLowerCase().includes(kw)) &&
+    (!df || u.dept===df) && (!rf || u.role===rf));
+  $('orgTable').innerHTML = list.map(p=>{
+    const permCell = p.role==='super_admin'
+      ? '<span class="pill on">全部业务 / 全部数字人 / 全部功能</span>'
+      : Object.entries(p.grants||{}).map(([entry,bots])=>
+          Object.entries(bots).map(([bid,mods])=>{
+            const modTxt = mods.map(m=>MODS[m]||m).join(' / ');
+            return `<div style="margin:3px 0;font-size:12px;line-height:1.6">
+              <span class="tag blue" style="margin-right:4px">一级 · ${ENTRY_NAME[entry]||entry}</span>
+              <span class="tag" style="margin-right:4px">二级 · ${BOTS[bid]?.name||bid}</span>
+              <span style="color:var(--muted)">三级 · ${modTxt}</span>
+            </div>`;
+          }).join('')
+        ).join('') || '<span style="color:var(--faint)">未分配（需先配置或授予角色）</span>';
+    const roleColor = { super_admin:'purple', admin:'blue', accessible:'green', user:'' }[p.role];
+    return `<tr>
+      <td><input type="checkbox" class="org-chk" data-u="${p.u}" ${orgSelRows.has(p.u)?'checked':''} onchange="toggleOrgRow('${p.u}', this)"></td>
+      <td><b>${p.u}</b></td>
+      <td class="mono" style="font-size:12px">${p.acct||'—'}</td>
+      <td>${p.dept}</td>
+      <td style="font-size:12px;color:var(--faint)">${p.path||'—'}</td>
+      <td>${p.locked
+        ? `<span class="tag ${roleColor}">${ROLE_LABEL[p.role]}</span>`
+        : `<span class="org-dept-select-wrap org-row-role-select-wrap"><select class="org-row-role-select" onchange="setOrgRole('${p.u}', this.value)">
+            ${Object.entries(ROLE_LABEL).map(([rk,rl])=>`<option value="${rk}" ${p.role===rk?'selected':''}>${rl}</option>`).join('')}
+          </select><i data-lucide="chevron-down" aria-hidden="true"></i></span>`}
+      </td>
+      <td style="vertical-align:top">${permCell}</td>
+      <td style="white-space:nowrap">${p.locked?'<span class="tag">内置</span>':`<button class="btn sm" onclick="openPermModal('${p.u}')">设置权限</button>`}</td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="8" style="color:var(--faint);text-align:center">无匹配成员</td></tr>';
+}
+function syncOrg(){ alert('原型示意：从组织架构系统同步成员与部门（自动去重更新，含账号 / 部门路径）。'); }
+function openGrantBatchModal(){
+  $('orgBatchRole').value = 'admin';
+  openModal('grantBatchModal');
+}
+function toggleOrgRow(u, cb){ if(cb.checked) orgSelRows.add(u); else orgSelRows.delete(u); }
+function toggleOrgAll(cb){
+  const boxes = [...document.querySelectorAll('#orgTable .org-chk')];
+  boxes.forEach(c=>c.checked = cb.checked);
+  orgSelRows = new Set(cb.checked ? boxes.map(c=>c.dataset.u) : []);
+}
+function grantBatch(){
+  const role = $('orgBatchRole').value;
+  const targets = [...document.querySelectorAll('.org-chk:checked')].map(c=>c.dataset.u);
+  if(!targets.length){ alert('请先勾选要授予的用户'); return; }
+  targets.forEach(u=>{ const p = ORG_USERS.find(x=>x.u===u); if(p && !p.locked) p.role = role; });
+  orgSelRows.clear();
+  renderOrg();
+  closeModal('grantBatchModal');
+  alert(`已批量授予 ${targets.length} 人「${ROLE_LABEL[role]}」角色`);
+}
+function setOrgRole(u, role){
+  const p = ORG_USERS.find(x=>x.u===u);
+  if(!p || p.locked) return;
+  p.role = role;
+  renderOrg();
+}
+/* ── 三级权限编辑弹窗（组织管理「设置权限」入口） ── */
+let permEditUser = null;
+function openPermModal(name){
+  permEditUser = ORG_USERS.find(p=>p.u===name);
+  if(!permEditUser) return;
+  $('permUserName').textContent = name + (permEditUser.acct ? '（'+permEditUser.acct+'）' : '');
+  renderPermTree();
+  openModal('permModal');
+}
+function renderPermTree(){
+  const g = permEditUser.grants || {};
+  $('permTree').innerHTML = Object.entries(ENTRY_BOTS).map(([entry,botIds])=>{
+    const entryOn = !!g[entry];
+    return `
+    <div style="border:1px solid var(--border);border-radius:10px;padding:10px 12px;background:var(--surface-soft)">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px;font-weight:700">
+        <input type="checkbox" data-entry="${entry}" ${entryOn?'checked':''} onchange="togglePermEntry('${entry}', this)">
+        一级 · ${ENTRY_NAME[entry]}
+      </label>
+      <div id="permBots-${entry}" style="margin:8px 0 0 26px;display:${entryOn?'grid':'none'};gap:8px">
+        ${botIds.map(bid=>{
+          const mods = (g[entry]||{})[bid] || Object.keys(MODS);
+          return `
+          <div style="border:1px dashed var(--border-strong);border-radius:8px;padding:8px 10px">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;font-weight:600">
+              <input type="checkbox" data-bot="${bid}" ${entryOn?'checked':''} onchange="togglePermBot('${entry}','${bid}', this)">
+              二级 · ${BOTS[bid]?.name||bid}
+            </label>
+            <div id="permMods-${entry}-${bid}" style="margin:6px 0 0 26px;display:${entryOn?'flex':'none'};gap:6px;flex-wrap:wrap">
+              ${Object.entries(MODS).map(([mk,mn])=>`
+                <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer;color:var(--muted)">
+                  <input type="checkbox" data-mod="${mk}" ${mods.includes(mk)?'checked':''}> 三级 · ${mn}
+                </label>`).join('')}
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+function togglePermEntry(entry, cb){
+  const box = $('permBots-'+entry);
+  if(!box) return;
+  box.style.display = cb.checked ? 'grid' : 'none';
+  box.querySelectorAll('input[data-bot]').forEach(b=>b.checked = cb.checked);
+  // 三级模块区与二级同步显隐（一级勾选时展开，取消时收起）
+  box.querySelectorAll('div[id^="permMods-"]').forEach(mb=>mb.style.display = cb.checked ? 'flex' : 'none');
+  box.querySelectorAll('input[data-mod]').forEach(m=>m.checked = cb.checked);
+}
+function togglePermBot(entry, bid, cb){
+  const box = $('permMods-'+entry+'-'+bid);
+  if(!box) return;
+  // 勾选二级 → 展开三级功能模块；取消 → 收起
+  box.style.display = cb.checked ? 'flex' : 'none';
+  box.querySelectorAll('input[data-mod]').forEach(m=>m.checked = cb.checked);
+}
+function savePerm(){
+  const g = {};
+  document.querySelectorAll('#permTree > div').forEach(ed=>{
+    const entryCb = ed.querySelector('input[data-entry]');
+    if(!entryCb || !entryCb.checked) return;
+    const entry = entryCb.dataset.entry;
+    g[entry] = {};
+    ed.querySelectorAll('input[data-bot]').forEach(bcb=>{
+      if(!bcb.checked) return;
+      const bid = bcb.dataset.bot;
+      const mods = [...ed.querySelectorAll('input[data-mod]:checked')]
+        .filter(m=>m.closest('div[id^="permMods-"]')?.id === `permMods-${entry}-${bid}`)
+        .map(m=>m.dataset.mod);
+      g[entry][bid] = mods.length ? mods : Object.keys(MODS);
+    });
+  });
+  permEditUser.grants = g;
+  closeModal('permModal');
+  renderConfig();
+  renderOrg();
+}
+/* ── 接入新数字人（通用配置） ── */
+function openBotModal(){
+  $('botName').value = '';
+  $('botEntry').value = 'it';
+  $('botSync').value = '每 5 分钟';
+  openModal('botModal');
+}
+function addBot(){
+  const name = $('botName').value.trim();
+  const entry = $('botEntry').value;
+  if(!name){ alert('请输入数字人名称'); return; }
+  const id = 'nb' + Date.now();
+  BOTS[id] = { id, ico: name[0], color:'#2bb3c0', name, status:'接入中', desc:ENTRY_NAME[entry]+' · 新接入', openScope:[ENTRY_NAME[entry]], msg:0, users:0, sessions:0, solve:0, active:0, hitRate:0, trend:[] };
+  ENTRY_BOTS[entry] = ENTRY_BOTS[entry] || [];
+  ENTRY_BOTS[entry].push(id);
+  BOT_ENTRY[id] = entry;
+  closeModal('botModal');
+  renderConfig();
+  alert(`已接入「${name}」→ ${ENTRY_NAME[entry]}；再到「用户权限分配」给用户开通该数字人权限，用户即可在对应业务下看到并运营。`);
+}
+
+/* ══════════════ 弹窗 ══════════════ */
+function openModal(id){ $(id).classList.add('show') }
+function closeModal(id){ $(id).classList.remove('show') }
+function openMetricModal(){ openModal('metricModal') }
+
+/* ══════════════ 事件绑定 & 初始化 ══════════════ */
+document.querySelectorAll('.nav-item').forEach(el=>el.addEventListener('click', ()=>go(el.dataset.page, el.dataset.entry)));
+document.querySelectorAll('.inner-tab').forEach(el=>el.addEventListener('click', ()=>setITab(el.dataset.itab)));
+['dashDim','dashRange'].forEach(id=>$(id).addEventListener('change', ()=>{ renderDashKpis(); renderDashCharts(); renderHot(); }));
+['grpDim','grpRange'].forEach(id=>$(id).addEventListener('change', updateGroupRange));
+['qaDim','qaRange'].forEach(id=>$(id).addEventListener('change', updateQaRange));
+['qaSearch','qaStatus'].forEach(id=>$(id).addEventListener('change', renderQA));
+window.addEventListener('keydown', e=>{ if(e.key==='Escape') document.querySelectorAll('.modal-mask.show').forEach(m=>m.classList.remove('show')); });
+window.addEventListener('resize', resizeCharts);
+// 容器尺寸真实变化（窗口缩放 / 网格重排）时自动重算所有图表尺寸
+if(window.ResizeObserver){
+  const ro = new ResizeObserver(()=>resizeCharts());
+  document.querySelectorAll('.chart-box').forEach(box=>ro.observe(box));
+}
+
+renderReportPeriod();
+renderOrgDepts();
+applyUser();
+go('bot-platform', 'overview');
+document.querySelectorAll('.card:has(#ovHot), .card:has(#dashHot)').forEach(hotCard=>{
+  let scrollTimer;
+  hotCard.addEventListener('scroll', ()=>{
+    hotCard.classList.add('is-scrolling');
+    clearTimeout(scrollTimer);
+    scrollTimer = setTimeout(()=>hotCard.classList.remove('is-scrolling'), 700);
+  }, {passive:true});
+});
+// 页面及弹窗统一滚动条行为：仅滚动时显示，停止后自动隐藏。
+const scrollTargets = new Set([
+  document.body,
+  document.documentElement,
+  document.scrollingElement,
+  ...document.querySelectorAll('.col-main, .main-shell, .nav-panel, .modal, .m-body, .inner-tabs, .bot-tabs, .org-table-scroll')
+].filter(Boolean));
+scrollTargets.forEach(target=>{
+  let scrollTimer;
+  target.addEventListener('scroll', ()=>{
+    target.classList.add('is-scrolling');
+    clearTimeout(scrollTimer);
+    scrollTimer = setTimeout(()=>target.classList.remove('is-scrolling'), 700);
+  }, {passive:true});
+});
+</script>
+<script src="./lucide.min.js"></script>
+<script src="./workbench-icons.js"></script>
+<script src="./workbench-ui.js?v=20260914-dashboard-select-1"></script>
+<script src="./personalization-ui.js?v=20260914-font-select-1"></script>
+<script>
+(() => {
+  const iconMap = [
+    ['同步组织架构','refresh-cw'], ['接入新数字人','plus'], ['确认接入','check'],
+    ['生成运营报告','file-text'], ['批量回流','corner-up-left'], ['查询','search'],
+    ['Seaf 观测','external-link'], ['确认授予','shield-check'], ['保存','save'],
+    ['确认上传','upload'], ['生成草稿','file-pen'], ['确认并落库','check'],
+    ['回流','corner-up-left'], ['加入','plus']
+  ];
+  function decorate() {
+    let added = false;
+    document.querySelectorAll('.btn.primary,.btn.newbtn').forEach(btn => {
+      if (btn.querySelector('svg,[data-lucide]')) return;
+      const match = iconMap.find(([label]) => btn.textContent.includes(label));
+      if (!match) return;
+      const icon = document.createElement('i');
+      icon.dataset.lucide = match[1];
+      icon.setAttribute('aria-hidden','true');
+      btn.prepend(icon);
+      added = true;
+    });
+    if (added) window.lucide?.createIcons?.();
+  }
+  decorate();
+  new MutationObserver(decorate).observe(document.body, {childList:true, subtree:true});
+})();
+</script>
+<script>
+if(new URLSearchParams(location.search).get('personalizationTest')==='1'){
+  const script=document.createElement('script');
+  script.src='./personalization-regression.js?v=20260910-1';
+  document.body.append(script);
+}
+</script>
+</body>
+</html>
