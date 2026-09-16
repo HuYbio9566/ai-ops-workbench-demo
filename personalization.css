@@ -79,6 +79,7 @@ html[data-p-theme="default"][data-p-resolved="light"] {
   --module-item-bg:#fff;
   --table-header-bg:var(--p-surface);
 }
+html[data-p-theme="default"][data-p-resolved="light"] .nav-item { --nav-hover:color-mix(in srgb,var(--p-text) 2%,var(--p-surface)); }
 html[data-p-theme="default"][data-p-resolved="light"] :is(.col-left,.p-navigation) { background:var(--surface-soft)!important; }
 html[data-p-theme="default"][data-p-resolved="light"] .col-main { background:var(--surface-soft)!important; }
 html[data-p-theme="default"][data-p-resolved="light"] .main-shell { background:var(--content-bg)!important; }
