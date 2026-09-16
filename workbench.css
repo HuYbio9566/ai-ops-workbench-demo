@@ -257,7 +257,7 @@ body:has(#page-legacy-feedback.active) .col-main { background:var(--bg)!importan
   border-radius:var(--ui-radius);
 }
 #page-legacy-org .org-toolbar { margin-bottom:20px; }
-/* 组织权限表：窄屏时横向滚动，固定选择/姓名和最右侧操作列。滚动条仅滚动时显示。 */
+/* 组织权限表：溢出时固定两侧，并保留横向滚动条。 */
 #page-legacy-org .org-table-scroll {
   width:100%;
   overflow-x:auto;
@@ -265,12 +265,12 @@ body:has(#page-legacy-feedback.active) .col-main { background:var(--bg)!importan
   scrollbar-width:none;
 }
 #page-legacy-org .org-table-scroll::-webkit-scrollbar { width:0; height:0; }
-#page-legacy-org .org-table-scroll.is-scrolling {
+#page-legacy-org .org-table-scroll.has-horizontal-overflow {
   scrollbar-width:thin;
   scrollbar-color:var(--border-strong) transparent;
 }
-#page-legacy-org .org-table-scroll.is-scrolling::-webkit-scrollbar { height:8px; }
-#page-legacy-org .org-table-scroll.is-scrolling::-webkit-scrollbar-thumb {
+#page-legacy-org .org-table-scroll.has-horizontal-overflow::-webkit-scrollbar { height:8px; }
+#page-legacy-org .org-table-scroll.has-horizontal-overflow::-webkit-scrollbar-thumb {
   background:var(--border-strong);
   border-radius:999px;
 }
@@ -331,6 +331,12 @@ body:has(#page-legacy-feedback.active) .col-main { background:var(--bg)!importan
   width:var(--org-permission-width, 360px);
   min-width:360px;
   max-width:520px;
+  white-space:normal;
+  overflow-wrap:anywhere;
+}
+#page-legacy-org .org-table td:nth-child(7) > div > span:last-child {
+  display:block;
+  margin-top:4px;
   white-space:normal;
   overflow-wrap:anywhere;
 }
