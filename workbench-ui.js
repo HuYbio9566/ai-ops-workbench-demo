@@ -227,6 +227,8 @@
     const table = container.querySelector('.org-table');
     if (!table) return;
     const updateOverflow = () => {
+      container.style.setProperty('--org-permission-width',
+        `${Math.min(520, Math.max(360, container.clientWidth - 860))}px`);
       container.classList.toggle('has-horizontal-overflow',
         container.clientWidth > 0 && table.getBoundingClientRect().width > container.clientWidth + 1);
     };

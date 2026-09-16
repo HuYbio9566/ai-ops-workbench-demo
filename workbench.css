@@ -328,7 +328,7 @@ body:has(#page-legacy-feedback.active) .col-main { background:var(--bg)!importan
 #page-legacy-org .org-table td:nth-child(6) { width:128px; min-width:128px; }
 #page-legacy-org .org-table th:nth-child(7),
 #page-legacy-org .org-table td:nth-child(7) {
-  width:clamp(360px, calc(100% - 860px), 520px);
+  width:var(--org-permission-width, 360px);
   min-width:360px;
   max-width:520px;
   white-space:normal;
