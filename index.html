@@ -2152,7 +2152,7 @@ function renderOrg(){
             ${Object.entries(ROLE_LABEL).map(([rk,rl])=>`<option value="${rk}" ${p.role===rk?'selected':''}>${rl}</option>`).join('')}
           </select><i data-lucide="chevron-down" aria-hidden="true"></i></span>`}
       </td>
-      <td style="vertical-align:top">${permCell}</td>
+      <td style="vertical-align:middle">${permCell}</td>
       <td style="white-space:nowrap">${p.locked?'<span class="tag">内置</span>':`<button class="btn sm" onclick="openPermModal('${p.u}')">设置权限</button>`}</td>
     </tr>`;
   }).join('') || '<tr><td colspan="8" style="color:var(--faint);text-align:center">无匹配成员</td></tr>';
