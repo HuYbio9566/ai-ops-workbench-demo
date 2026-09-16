@@ -223,6 +223,18 @@
       }
     });
   });
+  document.querySelectorAll('.org-table-scroll').forEach(container => {
+    const table = container.querySelector('.org-table');
+    if (!table) return;
+    const updateOverflow = () => {
+      container.classList.toggle('has-horizontal-overflow',
+        container.clientWidth > 0 && table.getBoundingClientRect().width > container.clientWidth + 1);
+    };
+    const observer = new ResizeObserver(updateOverflow);
+    observer.observe(container);
+    observer.observe(table);
+    updateOverflow();
+  });
   const scheme = matchMedia('(prefers-color-scheme: dark)');
   const originalColors = new WeakMap();
   function themeChart(chart) {

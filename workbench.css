@@ -275,7 +275,7 @@ body:has(#page-legacy-feedback.active) .col-main { background:var(--bg)!importan
   border-radius:999px;
 }
 #page-legacy-org .org-table {
-  min-width:1120px;
+  min-width:1480px;
   table-layout:fixed;
 }
 #page-legacy-org .org-table th,
@@ -320,6 +320,8 @@ body:has(#page-legacy-feedback.active) .col-main { background:var(--bg)!importan
 }
 #page-legacy-org .org-table th:nth-child(3),
 #page-legacy-org .org-table td:nth-child(3) { width:144px; min-width:144px; }
+#page-legacy-org .org-table th:nth-child(5),
+#page-legacy-org .org-table td:nth-child(5) { min-width:200px; }
 #page-legacy-org .org-table th:nth-child(4),
 #page-legacy-org .org-table td:nth-child(4),
 #page-legacy-org .org-table th:nth-child(6),
@@ -380,6 +382,15 @@ body:has(#page-legacy-feedback.active) .col-main { background:var(--bg)!importan
 }
 #page-legacy-org .org-table tr:hover td:nth-child(-n+2),
 #page-legacy-org .org-table tr:hover td:last-child { background:var(--surface-soft); }
+#page-legacy-org .org-table-scroll:not(.has-horizontal-overflow) .org-table :is(th, td):is(:nth-child(-n+2), :last-child) {
+  position:relative;
+  left:auto;
+  right:auto;
+  z-index:auto;
+}
+#page-legacy-org .org-table-scroll:not(.has-horizontal-overflow) .org-table :is(th, td)::after {
+  content:none;
+}
 
 /* 切换模拟用户弹窗保留滚动能力，仅隐藏可见滚动条。 */
 #userModal .modal { width:min(800px,calc(100vw - 32px))!important; scrollbar-width:none; }
