@@ -312,7 +312,12 @@ body:has(#page-legacy-feedback.active) .col-main { background:var(--bg)!importan
 #page-legacy-org .org-table th:nth-child(1) > input,
 #page-legacy-org .org-table td:nth-child(1) > input { display:block; margin:0 auto; }
 #page-legacy-org .org-table th:nth-child(2),
-#page-legacy-org .org-table td:nth-child(2) { width:80px; min-width:80px; }
+#page-legacy-org .org-table td:nth-child(2) { width:120px; min-width:120px; }
+#page-legacy-org .org-table td:nth-child(2) > b {
+  display:block;
+  white-space:normal;
+  overflow-wrap:anywhere;
+}
 #page-legacy-org .org-table th:nth-child(3),
 #page-legacy-org .org-table td:nth-child(3) { width:144px; min-width:144px; }
 #page-legacy-org .org-table th:nth-child(4),
