@@ -265,7 +265,7 @@ html[data-p-style="floating"] .p-navigation { overflow:hidden; }
   html[data-p-nav="icons"][data-p-position="left"] .nav-item { width:40px; height:40px; min-height:40px; padding:0; margin:4px auto; }
   html[data-p-nav="icons"][data-p-position="left"] .wb-label { display:none; }
   html[data-p-nav="labels"][data-p-position="left"] .nav-panel { padding-inline:6px; }
-  html[data-p-nav="labels"][data-p-position="left"] .nav-item { flex-direction:column; width:100%; min-height:52px; padding:7px 6px; }
+  html[data-p-nav="labels"][data-p-position="left"] .nav-item { flex-direction:column; width:100%; min-height:52px; padding:7px 6px; margin:0 0 8px; }
   html[data-p-nav="labels"][data-p-position="left"] .wb-label { font-size:11px; line-height:15px; width:100%; text-align:center; overflow-wrap:anywhere; }
   html:not([data-p-nav="wide"])[data-p-position="left"] :is(.user-line,.p-settings-trigger) { justify-content:center; }
   html:not([data-p-nav="wide"])[data-p-position="left"] .p-nav-tools { display:contents; }
