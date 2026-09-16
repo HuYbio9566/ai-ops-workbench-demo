@@ -2,6 +2,7 @@
 html[data-p-theme] {
   --bg:var(--p-bg); --surface:var(--p-surface); --surface-soft:var(--p-soft);
   --table-header-bg:var(--surface-soft);
+  --table-row-hover-bg:var(--surface-soft);
   --text:var(--p-text); --muted:var(--p-muted); --faint:var(--p-muted);
   --blue:var(--p-primary); --blue-deep:color-mix(in srgb,var(--p-primary) 86%,var(--p-text));
   --blue-soft:color-mix(in srgb,var(--p-primary) 12%,var(--p-surface));
@@ -74,6 +75,7 @@ html[data-p-theme="default"][data-p-resolved="light"] {
   --content-bg:#f7f9fa;
   --overview-card-bg:#fff;
   --nav-active-bg:#eef5ff;
+  --table-row-hover-bg:#f5f6f7;
   --nav-hover:color-mix(in srgb,var(--p-text) 2%,var(--p-surface));
   --overview-item-bg:#F7F9FA;
   --overview-item-hover:#F5F6F8;
@@ -190,10 +192,11 @@ html[data-p-theme] #page-legacy-org .org-table td:last-child {
   color:var(--text);
   border-color:var(--border);
 }
+html[data-p-theme] tr:hover td { background:var(--table-row-hover-bg); }
 html[data-p-theme] #page-legacy-org .org-table tr:hover td,
 html[data-p-theme] #page-legacy-org .org-table tr:hover td:nth-child(-n+2),
 html[data-p-theme] #page-legacy-org .org-table tr:hover td:last-child {
-  background:var(--surface-soft);
+  background:var(--table-row-hover-bg);
 }
 html[data-p-theme] #orgSearch { flex:0 0 240px !important; width:240px; min-width:240px; box-sizing:border-box; }
 html[data-p-theme] .org-dept-select-wrap { position:relative; display:inline-flex; align-items:center; }
