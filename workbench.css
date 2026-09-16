@@ -56,7 +56,7 @@ body { background:var(--bg); color:var(--text); }
 .inner-tab .wb-icon { width:16px; height:16px; }
 #itab-bot-qa .bot-ico { background:var(--surface-soft)!important; color:var(--text); }
 .inner-tab.active:hover { background:var(--blue); color:var(--primary-foreground); }
-.wb-label { position:static; width:auto; height:auto; margin:0; padding:0; overflow:visible; clip-path:none; white-space:normal; }
+.wb-label { position:static; display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; min-width:0; width:auto; height:auto; margin:0; padding:0; overflow:hidden; text-overflow:ellipsis; overflow-wrap:anywhere; clip-path:none; white-space:normal; }
 .card,.kpi,.bot-card,.inner-tabs { border-radius:var(--ui-radius); }
 .btn,.btn.sm,select,input[type=text],textarea { border-radius:var(--ui-control-radius); min-height:var(--ui-control-height); }
 .btn,.seg .seg-btn,input[type=text],textarea { background:var(--surface-soft); color:var(--text); border-color:var(--border-strong); box-shadow:none; }
