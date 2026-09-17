@@ -92,6 +92,13 @@ html[data-p-theme="default"][data-p-resolved="light"] {
   --module-item-bg:#fff;
   --table-header-bg:var(--p-surface);
 }
+html[data-p-theme="default"][data-p-resolved="dark"] {
+  --content-bg:var(--surface);
+  --overview-card-bg:var(--bg);
+}
+html[data-p-theme="default"][data-p-resolved="dark"] .main-shell {
+  background:var(--content-bg)!important;
+}
 html[data-p-theme="default"][data-p-resolved="light"] :is(.col-left,.p-navigation) { background:var(--surface-soft)!important; }
 html[data-p-theme="default"][data-p-resolved="light"] .col-main { background:var(--surface-soft)!important; }
 html[data-p-theme="default"][data-p-resolved="light"] :is(.modal,.modal .m-head,.p-dialog) { background:var(--surface-soft); }
@@ -138,10 +145,11 @@ html[data-p-theme] #page-bot-platform #itab-bot-overview .bot-card .b-name,
 html[data-p-theme] #page-bot-platform #itab-bot-overview .bot-metric b {
   color:var(--overview-heading, var(--text));
 }
-html[data-p-theme="default"][data-p-resolved="light"] #page-bot-platform #itab-bot-dash > .card,
-html[data-p-theme="default"][data-p-resolved="light"] #page-bot-platform #itab-bot-dash > .grid > .card {
+html[data-p-theme="default"] #page-bot-platform #itab-bot-dash > .card,
+html[data-p-theme="default"] #page-bot-platform #itab-bot-dash > .grid > .card {
   background:var(--overview-card-bg);
   border:0;
+  box-shadow:none;
 }
 html[data-p-theme="default"][data-p-resolved="light"] #page-bot-platform #itab-bot-qa > .card:not(.module-toolbar),
 html[data-p-theme="default"][data-p-resolved="light"] #page-bot-platform #itab-bot-groups > .card:not(.module-toolbar),
