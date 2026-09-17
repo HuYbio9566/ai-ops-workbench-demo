@@ -1,0 +1,175 @@
+:is(#libPickerModal,#grpPickerModal,#handleMissModal,#reflowedModal,#qaModal) .xbtn {
+  width:var(--ui-control-height);
+  min-width:var(--ui-control-height);
+  border-radius:var(--ui-control-radius);
+}
+#itab-bot-qa .qa-history-toolbar { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; }
+#kbLibCards .b-head,
+#grpCards .b-head {
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr) auto;
+  align-items:start;
+}
+#kbLibCards .b-head > div,
+#grpCards .b-head > div { min-width:0; }
+#kbLibCards .kb-joined-status,
+#grpCards .grp-monitored-status {
+  justify-self:end;
+  white-space:nowrap;
+}
+#itab-bot-qa .rf-heading,
+.rf-toolbar,
+.rf-actions,
+.rf-record-footer,
+.rf-meta,
+.rf-select,
+.rf-table-actions {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+}
+#itab-bot-qa .rf-heading > .btn {
+  margin-left:auto;
+  padding-inline:12px;
+  width:auto;
+  min-width:0;
+  flex:0 0 auto;
+}
+#itab-bot-qa .rf-heading > .btn > [data-lucide="book-open"] {
+  width:14px;
+  height:14px;
+  flex:none;
+}
+#itab-bot-qa .rf-columns {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:20px;
+}
+#itab-bot-qa .rf-column {
+  min-width:0;
+  margin:0;
+  padding:16px;
+  max-height:612px;
+  overflow-y:auto;
+  overflow-x:hidden;
+  scrollbar-width:thin;
+  scrollbar-gutter:stable;
+  scrollbar-color:transparent transparent;
+}
+#itab-bot-qa .rf-column::-webkit-scrollbar { width:6px; }
+#itab-bot-qa .rf-column::-webkit-scrollbar-track { background:transparent; }
+#itab-bot-qa .rf-column::-webkit-scrollbar-thumb { background:transparent; border:0; }
+#itab-bot-qa .rf-column.is-scrolling { scrollbar-color:var(--border-strong) transparent; }
+#itab-bot-qa .rf-column.is-scrolling::-webkit-scrollbar-thumb { background:var(--border-strong); }
+#itab-bot-qa .rf-column h3 { font-size:14px; line-height:24px; margin:0; }
+.rf-toolbar { min-height:40px; margin-bottom:12px; }
+#itab-bot-qa .rf-column > .rf-toolbar {
+  height:var(--ui-control-height);
+  min-height:var(--ui-control-height);
+  flex-wrap:nowrap;
+}
+.rf-toolbar > input { flex:1 1 180px; min-width:0; }
+.rf-toolbar > select { max-width:100%; }
+#itab-bot-qa .rf-toolbar > h3 { margin-right:auto; }
+#missQa,#pendingList,#reflowedPanel { display:grid; gap:12px; min-width:0; }
+.rf-record {
+  min-width:0;
+  padding:12px;
+  color:var(--text);
+  overflow-wrap:anywhere;
+}
+.rf-meta { font-size:12px; line-height:20px; color:var(--muted); }
+#missQa .rf-record-header {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:center;
+  gap:8px;
+  margin-top:8px;
+}
+#missQa .rf-record > .rf-question { margin-top:0; }
+#missQa .rf-record-header > .rf-meta { min-width:0; }
+#missQa .rf-meta > .tag,
+#hmSource > .tag {
+  display:inline-flex;
+  align-items:center;
+  box-sizing:border-box;
+  height:24px;
+  padding:0 12px;
+  font-size:12px;
+  line-height:20px;
+  white-space:nowrap;
+  flex-shrink:0;
+}
+.rf-select { cursor:pointer; }
+.rf-question { font-size:14px; line-height:22px; font-weight:600; margin:8px 0; }
+.rf-answer { font-size:13px; line-height:22px; color:var(--muted); white-space:pre-wrap; }
+.rf-preview { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.rf-actions { justify-content:flex-end; margin-top:8px; }
+.rf-record-footer { justify-content:space-between; margin-top:8px; }
+.rf-record-footer .rf-actions { margin-top:0; }
+.rf-empty { padding:24px 12px; color:var(--muted); text-align:center; font-size:13px; }
+.rf-field {
+  display:grid;
+  min-width:0;
+  gap:var(--ui-field-label-gap);
+  margin-bottom:var(--ui-field-gap);
+  font-size:var(--ui-control-font-size);
+  line-height:22px;
+  color:var(--text);
+}
+.rf-field :is(input,textarea,select:not(.ui-select-native),.ui-select-enhanced) {
+  width:100%;
+  min-width:0;
+  box-sizing:border-box;
+}
+:root .rf-field :is(input[type="text"],textarea,select:not(.ui-select-native),.ui-select-trigger) {
+  padding-inline:var(--ui-control-padding-inline);
+  font-family:inherit;
+  font-size:var(--ui-control-font-size);
+  border-radius:var(--ui-control-radius);
+  background:var(--control-bg);
+  color:var(--control-text);
+  transition:background-color .15s ease-out,outline-color .15s ease-out,color .15s ease-out;
+}
+.rf-field select:not(.ui-select-native) {
+  padding-left:var(--ui-control-padding-inline)!important;
+}
+:root .rf-field textarea {
+  min-height:112px;
+  padding-block:var(--ui-textarea-padding-block);
+  line-height:22px;
+  resize:vertical;
+  border:0;
+  outline:var(--ui-control-theme-stroke-width) solid var(--control-border);
+  outline-offset:calc(var(--ui-control-theme-stroke-width) * -1);
+}
+:root .rf-field :is(input[type="text"],textarea,select:not(.ui-select-native),.ui-select-trigger):is(:hover,:focus):not(:disabled) {
+  background:var(--control-hover-bg);
+  outline-color:var(--control-hover-border);
+}
+:root .rf-field textarea:is(:hover,:focus):not(:disabled) {
+  outline-width:max(1px,var(--ui-control-theme-stroke-width));
+  outline-offset:calc(max(1px,var(--ui-control-theme-stroke-width)) * -1);
+}
+html[data-p-theme="neumorphism"] .rf-field textarea:focus-visible { box-shadow:var(--neu-inset); }
+.rf-field :is(input,textarea)::placeholder { color:var(--muted); opacity:1; }
+.rf-field .ui-select-value { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.rf-error { color:var(--bad); font-size:13px; }
+.rf-error:empty,#reflowStatus:empty,.rf-status:empty { display:none; }
+#reflowStatus,.rf-status { color:var(--muted); font-size:13px; margin-top:12px; }
+#hmSource { margin-bottom:var(--ui-field-gap); }
+#handleMissModal .modal { width:640px; max-width:calc(100vw - 32px); box-sizing:border-box; }
+#handleMissModal .m-head { padding-inline:var(--ui-field-gap); }
+#handleMissModal .m-body { padding:var(--ui-field-gap); }
+#handleMissModal .m-head { font-size:16px; line-height:24px; }
+#handleMissModal .m-foot > .btn { padding-inline:var(--ui-control-padding-inline); }
+#reflowedModal .modal { width:880px; max-width:calc(100vw - 32px); }
+#reflowedPanel { max-height:60vh; overflow:auto; }
+.qa-history-table .rf-table-actions {
+  width:max-content;
+  flex-wrap:nowrap;
+}
+@media (max-width:1100px) {
+  #itab-bot-qa .rf-columns { grid-template-columns:minmax(0,1fr); }
+}

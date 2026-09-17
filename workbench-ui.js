@@ -16,19 +16,26 @@
     return el;
   }
   function refreshIcons() { window.lucide?.createIcons?.(); }
-  const selectRoots = new Set();
+  let activeSelect = null;
   let selectUid = 0;
   function closeSelects(except) {
-    selectRoots.forEach(root => {
-      if (root === except) return;
-      root.classList.remove('is-open');
-      root.querySelector('.ui-select-trigger')?.setAttribute('aria-expanded','false');
-      const menu = root.querySelector('.ui-select-menu');
-      if (menu) menu.hidden = true;
-    });
+    if (activeSelect && activeSelect.root !== except) activeSelect.close();
+  }
+  function selectMenuPlacement(rect, height, width, viewportWidth, viewportHeight) {
+    const edge = 8, gap = 4;
+    const below = Math.max(0, viewportHeight - rect.bottom - gap - edge);
+    const above = Math.max(0, rect.top - gap - edge);
+    const upward = height > below && above > below;
+    const maxHeight = Math.min(320, upward ? above : below);
+    return {
+      left: Math.max(edge, Math.min(rect.left, viewportWidth - width - edge)),
+      top: upward ? Math.max(edge, rect.top - gap - Math.min(height, maxHeight)) : rect.bottom + gap,
+      maxHeight,
+    };
   }
   function enhanceSelect(select) {
-    if (!select || select.dataset.uiEnhanced === 'true' || select.multiple) return;
+    if (!select || select.dataset.uiEnhanced === 'true' || select.multiple ||
+      !('showPopover' in HTMLElement.prototype)) return;
     let root = select.closest('.dash-select-wrap,.org-dept-select-wrap,.p-font-select-wrap');
     if (!root) {
       root = document.createElement('span');
@@ -58,6 +65,7 @@
     trigger.append(value,icon('chevron-down'));
     menu.id = menuId;
     menu.className = 'ui-select-menu';
+    menu.setAttribute('popover','manual');
     menu.setAttribute('role','listbox');
     menu.hidden = true;
     function rebuild() {
@@ -76,17 +84,39 @@
       value.textContent = select.selectedOptions[0]?.textContent || '';
       options.forEach(item => item.setAttribute('aria-selected',String(item.dataset.value === select.value)));
     }
+    function positionMenu() {
+      if (!trigger.isConnected || !trigger.getClientRects().length) { closeMenu(); return; }
+      const rect = trigger.getBoundingClientRect();
+      menu.style.minWidth = `${Math.min(rect.width, window.innerWidth - 16)}px`;
+      menu.style.maxWidth = `${Math.max(0, window.innerWidth - 16)}px`;
+      menu.style.maxHeight = '320px';
+      const placement = selectMenuPlacement(rect, menu.offsetHeight, menu.offsetWidth,
+        window.innerWidth, window.innerHeight);
+      menu.style.left = `${placement.left}px`;
+      menu.style.top = `${placement.top}px`;
+      menu.style.maxHeight = `${placement.maxHeight}px`;
+    }
+    const triggerObserver = new ResizeObserver(() => {
+      if (root.classList.contains('is-open')) positionMenu();
+    });
     function openMenu(focusSelected = false) {
       sync(); closeSelects(root);
       root.classList.add('is-open');
       trigger.setAttribute('aria-expanded','true');
       menu.hidden = false;
+      menu.showPopover();
+      activeSelect = { root, menu, trigger, close:closeMenu, position:positionMenu };
+      positionMenu();
+      triggerObserver.observe(trigger);
       if (focusSelected) options.find(item => item.getAttribute('aria-selected') === 'true')?.focus();
     }
     function closeMenu(returnFocus = false) {
       root.classList.remove('is-open');
       trigger.setAttribute('aria-expanded','false');
+      triggerObserver.disconnect();
+      if (menu.matches(':popover-open')) menu.hidePopover();
       menu.hidden = true;
+      if (activeSelect?.root === root) activeSelect = null;
       if (returnFocus) trigger.focus();
     }
     function choose(item) {
@@ -128,14 +158,33 @@
     });
     select.addEventListener('change',sync);
     root.append(trigger,menu);
-    selectRoots.add(root);
     sync();
   }
-  function enhanceAllSelects() { document.querySelectorAll('select').forEach(enhanceSelect); }
+  function enhanceAllSelects() {
+    document.querySelectorAll('select').forEach(enhanceSelect);
+    if (activeSelect && !activeSelect.trigger.isConnected) closeSelects();
+  }
   enhanceAllSelects();
   new MutationObserver(enhanceAllSelects).observe(document.body,{childList:true,subtree:true});
   document.addEventListener('pointerdown',event => {
     if (!event.target.closest('.ui-select-enhanced')) closeSelects();
+  });
+  document.addEventListener('keydown',event => {
+    if (event.key !== 'Escape' || !activeSelect) return;
+    event.preventDefault();
+    event.stopPropagation();
+    activeSelect.close(true);
+  }, true);
+  document.addEventListener('focusin',event => {
+    if (activeSelect && !activeSelect.root.contains(event.target)) closeSelects();
+  });
+  document.addEventListener('scroll',event => {
+    if (activeSelect && !activeSelect.menu.contains(event.target)) closeSelects();
+  }, {capture:true, passive:true});
+  window.addEventListener('resize',() => activeSelect?.position());
+  document.addEventListener('mouseover',event => {
+    const label = event.target.closest('.bot-card .b-name, .bot-card .b-sub');
+    if (label) label.title = label.textContent.trim();
   });
   document.querySelectorAll('.info-ic').forEach(el => {
     if (el.textContent.trim() === '?') el.replaceChildren(icon('circle-help'));
@@ -190,7 +239,7 @@
     function enhanceHeader() {
       const title = head.querySelector('b');
       if (title) {
-        title.id = `${mask.id}Title`;
+        if (!title.id) title.id = `${mask.id}Title`;
         dialog.setAttribute('aria-labelledby',title.id);
       }
       head.querySelectorAll('.xbtn').forEach(button => {
@@ -223,20 +272,35 @@
       }
     });
   });
-  document.querySelectorAll('.org-table-scroll').forEach(container => {
-    const table = container.querySelector('.org-table');
+  function setupTableOverflow(container) {
+    const table = container.querySelector('table');
     if (!table) return;
     const updateOverflow = () => {
-      container.style.setProperty('--org-permission-width',
-        `${Math.min(520, Math.max(360, container.clientWidth - 860))}px`);
-      container.classList.toggle('has-horizontal-overflow',
-        container.clientWidth > 0 && table.getBoundingClientRect().width > container.clientWidth + 1);
+      if (table.classList.contains('org-table')) {
+        container.style.setProperty('--org-permission-width',
+          `${Math.min(520, Math.max(360, container.clientWidth - 860))}px`);
+      }
+      const overflowing = container.clientWidth > 0 &&
+        Math.max(table.getBoundingClientRect().width, table.scrollWidth) > container.clientWidth + 1;
+      container.classList.toggle('has-horizontal-overflow', overflowing);
+      if (overflowing) container.setAttribute('tabindex', '0');
+      else container.removeAttribute('tabindex');
     };
-    const observer = new ResizeObserver(updateOverflow);
+    let frame;
+    const scheduleUpdate = () => {
+      if (frame) return;
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        updateOverflow();
+      });
+    };
+    const observer = new ResizeObserver(scheduleUpdate);
     observer.observe(container);
     observer.observe(table);
+    new MutationObserver(scheduleUpdate).observe(table, {childList:true, subtree:true, characterData:true});
     updateOverflow();
-  });
+  }
+  document.querySelectorAll('.ui-table-scroll').forEach(setupTableOverflow);
   const scheme = matchMedia('(prefers-color-scheme: dark)');
   const originalColors = new WeakMap();
   function themeChart(chart) {
