@@ -43,7 +43,7 @@
 }
 #itab-bot-qa .rf-columns {
   display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
+  grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
   gap:20px;
 }
 #itab-bot-qa .rf-column {
@@ -169,7 +169,4 @@ html[data-p-theme="neumorphism"] .rf-field textarea:focus-visible { box-shadow:v
 .qa-history-table .rf-table-actions {
   width:max-content;
   flex-wrap:nowrap;
-}
-@media (max-width:1100px) {
-  #itab-bot-qa .rf-columns { grid-template-columns:minmax(0,1fr); }
 }
