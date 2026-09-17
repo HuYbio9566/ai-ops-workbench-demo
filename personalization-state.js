@@ -28,7 +28,7 @@
   };
   const defaults = Object.freeze({ version: 1, theme: 'default', mode: 'light', position: 'left', style: 'embedded', nav: 'wide', font: 'theme' });
   const choices = { theme: Object.keys(themes), mode: ['light','dark','system'], position: ['left','top'], style: ['standard','embedded','floating'], nav: ['wide','icons','labels'], font: ['theme','sans','serif','mono'] };
-  const key = 'ai-ops:public-demo:personalization:v1';
+  const key = 'ai-ops:public-demo:personalization:v2';
   const media = matchMedia('(prefers-color-scheme: dark)');
   const fonts = { sans: '-apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif', serif: 'Georgia, "Songti SC", "STSong", serif', mono: '"SFMono-Regular", Consolas, "PingFang SC", monospace', neo: '"Space Grotesk", -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif' };
   function normalize(input) {
