@@ -25,7 +25,7 @@
   --table-time-column-min:160px;
   --table-compact-column-min:96px;
   --table-scrollbar-size:8px;
-  --table-fixed-shadow:rgba(0,0,0,.16);
+  --table-fixed-shadow:rgba(0,0,0,.08);
   --shadow-soft:none; --shadow:none;
 }
 @media (prefers-color-scheme:dark) {
@@ -338,16 +338,15 @@ body:has(#page-legacy-feedback.active) .col-main { background:var(--bg)!importan
 .ui-table-scroll.has-horizontal-overflow .ui-data-table :is(th,td):first-child,
 .ui-table-scroll.has-horizontal-overflow .ui-data-table.has-actions :is(th,td):last-child {
   position:sticky;
+  overflow:visible;
   z-index:2;
   background:var(--overview-card-bg,var(--surface));
 }
 .ui-table-scroll.has-horizontal-overflow .ui-data-table :is(th,td):first-child {
   left:0;
-  box-shadow:5px 0 8px -5px var(--table-fixed-shadow);
 }
 .ui-table-scroll.has-horizontal-overflow .ui-data-table.has-actions :is(th,td):last-child {
   right:0;
-  box-shadow:-5px 0 8px -5px var(--table-fixed-shadow);
 }
 .ui-table-scroll.has-horizontal-overflow .ui-data-table thead th {
   background:var(--table-header-bg,var(--surface-soft));
@@ -450,26 +449,25 @@ body:has(#page-legacy-feedback.active) .col-main { background:var(--bg)!importan
 #page-legacy-org .org-table td:nth-child(2),
 #page-legacy-org .org-table th:last-child,
 #page-legacy-org .org-table td:last-child { position:sticky; overflow:visible; }
-#page-legacy-org .org-table th:nth-child(2)::after,
-#page-legacy-org .org-table td:nth-child(2)::after,
-#page-legacy-org .org-table th:last-child::after,
-#page-legacy-org .org-table td:last-child::after {
+.ui-table-scroll.has-horizontal-overflow .ui-data-table :is(th,td):first-child::after,
+.ui-table-scroll.has-horizontal-overflow .ui-data-table.has-actions :is(th,td):last-child::after,
+#page-legacy-org .has-horizontal-overflow .org-table :is(th,td):is(:nth-child(2),:last-child)::after {
   position:absolute;
   top:0;
   bottom:-1px;
-  width:30px;
+  width:12px;
   content:"";
   pointer-events:none;
   z-index:1;
 }
-#page-legacy-org .org-table th:nth-child(2)::after,
-#page-legacy-org .org-table td:nth-child(2)::after {
+.ui-table-scroll.has-horizontal-overflow .ui-data-table :is(th,td):first-child::after,
+#page-legacy-org .has-horizontal-overflow .org-table :is(th,td):nth-child(2)::after {
   right:0;
   transform:translateX(100%);
   box-shadow:inset 10px 0 8px -8px var(--table-fixed-shadow);
 }
-#page-legacy-org .org-table th:last-child::after,
-#page-legacy-org .org-table td:last-child::after {
+.ui-table-scroll.has-horizontal-overflow .ui-data-table.has-actions :is(th,td):last-child::after,
+#page-legacy-org .has-horizontal-overflow .org-table :is(th,td):last-child::after {
   left:0;
   transform:translateX(-100%);
   box-shadow:inset -10px 0 8px -8px var(--table-fixed-shadow);
