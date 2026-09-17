@@ -442,7 +442,10 @@ html[data-p-theme] #ops-personalization { background:var(--p-dialog-bg); }
 .p-reset-block p { margin-top:4px; font-size:12px; line-height:1.5; color:var(--muted); }
 .p-reset { display:flex; align-items:center; gap:6px; flex:none; }
 .p-status { min-height:18px; margin-top:10px; font-size:12px; color:var(--muted); }
-.p-user-option { width:100%; font:inherit; color:var(--text); text-align:left; }
+.p-user-option { width:100%; font:inherit; color:var(--text); text-align:left; background:var(--user-option-bg,transparent); }
+.p-user-option:is(:hover,:focus-visible) { background:var(--nav-hover); }
+html[data-p-theme="brutalist"] .p-user-option:is(:hover,:focus-visible) { color:var(--brutal-ink); }
+html[data-p-theme="brutalist"] .p-user-option:is(:hover,:focus-visible) > div:not(.u-avatar) { --muted:var(--brutal-ink); }
 .p-mobile-only { display:none; }
 
 /* 一级数字人切换 Tab：按规范固定 32px，高度不影响二级 Tab。 */
