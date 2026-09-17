@@ -10,10 +10,11 @@ html[data-p-theme] {
   --new:var(--blue); --new-soft:var(--blue-soft); --grad:var(--blue); --grad-deep:var(--blue-deep);
   --surface-hover:color-mix(in srgb,var(--p-text) 7%,var(--p-surface)); --nav-hover:color-mix(in srgb,var(--p-text) 4%,var(--p-surface)); --sidebar-bg:var(--p-surface);
   --content-bg:var(--bg);
+  --p-dialog-bg:var(--bg);
   --nav-active-bg:var(--blue-soft);
   --control-bg:var(--surface-soft); --control-hover-bg:var(--control-bg); --control-hover-border:var(--blue);
   --control-border:var(--border-strong); --control-text:var(--text);
-  --select-menu-bg:var(--surface-soft); --select-option-hover-bg:var(--surface-hover);
+  --select-menu-bg:var(--surface-soft); --select-option-hover-bg:var(--nav-hover);
   --select-option-selected-bg:var(--nav-active-bg);
   --primary-bg:var(--blue); --primary-hover-bg:var(--blue-deep); --primary-text:var(--primary-foreground);
   --ui-control-radius:var(--p-radius); --ui-radius:var(--p-card); --p-avatar-radius:var(--ui-control-radius);
@@ -82,6 +83,7 @@ html[data-p-theme] .modal .m-head { border-radius:var(--ui-radius) var(--ui-radi
 html[data-p-theme] .main-shell { background:var(--surface); }
 /* 默认浅色主题：导航保持白色，内容容器使用独立的浅灰画布。 */
 html[data-p-theme="default"][data-p-resolved="light"] {
+  --p-dialog-bg:var(--surface-soft);
   --content-bg:#f7f9fa;
   --overview-card-bg:#fff;
   --nav-active-bg:#eef5ff;
@@ -93,8 +95,13 @@ html[data-p-theme="default"][data-p-resolved="light"] {
   --table-header-bg:var(--p-surface);
 }
 html[data-p-theme="default"][data-p-resolved="dark"] {
+  --blue-soft:color-mix(in srgb,var(--p-primary) 18%,var(--surface));
   --content-bg:var(--surface);
   --overview-card-bg:var(--bg);
+  --overview-card-border-width:0px;
+  --module-item-bg:var(--overview-card-bg);
+  --table-header-bg:var(--content-bg);
+  --table-row-hover-bg:var(--surface-hover);
 }
 html[data-p-theme="default"][data-p-resolved="dark"] .main-shell {
   background:var(--content-bg)!important;
@@ -120,6 +127,11 @@ html[data-p-theme="default"][data-p-resolved="light"] #page-legacy-org > .card {
   border:0;
   box-shadow:none;
 }
+html[data-p-theme="default"][data-p-resolved="dark"] #page-legacy-org > .card {
+  background:var(--overview-card-bg)!important;
+  border:0;
+  box-shadow:none;
+}
 html[data-p-theme] .main-shell:has(#page-legacy-org.active) {
   background:var(--surface)!important;
 }
@@ -130,8 +142,8 @@ html[data-p-theme="default"][data-p-resolved="light"] #page-legacy-feedback > .l
 html[data-p-theme="default"][data-p-resolved="light"] #page-legacy-knowledge > .legacy-card,
 html[data-p-theme="default"][data-p-resolved="light"] #page-legacy-tuitui > .legacy-card { background:transparent!important; }
 html[data-p-theme="default"][data-p-resolved="light"][data-p-style="embedded"] body:has(#page-legacy-feedback.active) .col-main { background:transparent!important; }
-html[data-p-theme="default"][data-p-resolved="light"] #page-bot-platform #itab-bot-overview > .card,
-html[data-p-theme="default"][data-p-resolved="light"] #page-bot-platform #itab-bot-overview > .grid > .card {
+html[data-p-theme="default"] #page-bot-platform #itab-bot-overview > .card,
+html[data-p-theme="default"] #page-bot-platform #itab-bot-overview > .grid > .card {
   background:var(--overview-card-bg);
   border:0;
 }
@@ -351,6 +363,7 @@ html[data-p-theme] .main-shell.is-scrolling::-webkit-scrollbar { width:8px; heig
 html[data-p-theme] .main-shell.is-scrolling::-webkit-scrollbar-thumb { background:var(--border-strong); border-radius:999px; }
 .p-dialog { position:fixed; inset:50% auto auto 50%; transform:translate(-50%,-50%); margin:0; width:min(880px,calc(100vw - 32px)); height:min(760px,calc(100dvh - 64px)); max-width:calc(100vw - 32px); max-height:calc(100dvh - 64px); border:1px solid var(--border); border-radius:var(--ui-radius); background:var(--surface); color:var(--text); padding:0; box-shadow:0 24px 64px #0000002e; font-family:var(--p-font); }
 .p-dialog::backdrop { background:#00000055; }
+html[data-p-theme] #ops-personalization { background:var(--p-dialog-bg); }
 .p-dialog[open] { display:flex; flex-direction:column; }
 .p-dialog-head,.p-dialog-foot { flex:none; display:flex; align-items:center; justify-content:space-between; gap:12px; padding:20px 24px; }
 .p-dialog-head { border-bottom:1px solid var(--border); }
@@ -712,7 +725,7 @@ html[data-p-theme="neumorphism"] #ops-personalization .p-font { box-shadow:var(-
 
 /* Neo-brutalism：高饱和强调色、粗黑边框和无模糊硬阴影。 */
 html[data-p-theme="brutalist"] {
-  --brutal-cream:#FFFDF5;
+  --brutal-cream:var(--bg);
   --brutal-ink:#000000;
   --brutal-yellow:#FFD93D;
   --brutal-violet:#C4B5FD;
@@ -733,7 +746,6 @@ html[data-p-theme="brutalist"] {
   --control-hover-bg:var(--brutal-yellow);
   --control-hover-border:var(--brutal-ink);
   --select-menu-bg:#FFFFFF;
-  --select-option-hover-bg:var(--brutal-violet);
   --select-option-selected-bg:var(--brutal-yellow);
   --overview-card-bg:#FFFFFF;
   --overview-card-border:var(--brutal-ink);
@@ -744,7 +756,7 @@ html[data-p-theme="brutalist"] {
   --overview-item-border:var(--brutal-ink);
   --overview-item-border-width:var(--brutal-border-width);
   --overview-item-shadow:var(--brutal-shadow-small);
-  --overview-tab-bg:var(--brutal-yellow);
+  --overview-tab-bg:var(--bg);
   --overview-tab-hover:var(--brutal-violet);
   --overview-tab-active-bg:var(--brutal-yellow);
   --overview-tab-active-text:var(--brutal-ink);
@@ -761,6 +773,10 @@ html[data-p-theme="brutalist"] .main-shell,
 html[data-p-theme="brutalist"] #page-bot-platform {
   background:var(--brutal-cream);
   color:var(--brutal-ink);
+}
+
+html[data-p-theme="brutalist"] .main-shell:has(#page-bot-platform.active) .page-context-switcher .bot-tabs {
+  background:var(--overview-tab-bg);
 }
 
 html[data-p-theme="brutalist"] .brand,
@@ -790,11 +806,6 @@ html[data-p-theme="brutalist"] :is(.card,.kpi,.bot-card,.legacy-card,.bot-bar,.m
 }
 html[data-p-theme="brutalist"] :is(.card,.kpi,.bot-card,.legacy-card,.bot-bar,.modal,.inner-tabs):hover {
   box-shadow:var(--brutal-shadow);
-}
-html[data-p-theme="brutalist"] .ui-table-scroll {
-  background:var(--overview-item-bg);
-  border:var(--overview-item-border-width) solid var(--overview-item-border);
-  box-shadow:var(--overview-item-shadow);
 }
 html[data-p-theme="brutalist"] #page-bot-platform #itab-bot-overview > .card:has(#botCards) {
   border:var(--overview-card-border-width) solid var(--overview-card-border);
@@ -873,49 +884,115 @@ html[data-p-theme="brutalist"] .badge.new { background:var(--brutal-violet); col
 html[data-p-theme="brutalist"] .modal .m-head { border-bottom:var(--brutal-border); border-radius:0; background:var(--brutal-yellow); }
 html[data-p-theme="brutalist"] .xbtn { color:var(--brutal-ink); font-weight:900; }
 html[data-p-theme="brutalist"] ::selection { background:var(--brutal-yellow); color:var(--brutal-ink); }
-html[data-p-theme="brutalist"][data-p-resolved="dark"] body,
-html[data-p-theme="brutalist"][data-p-resolved="dark"] .wrap,
-html[data-p-theme="brutalist"][data-p-resolved="dark"] .col-main,
-html[data-p-theme="brutalist"][data-p-resolved="dark"] .main-shell,
-html[data-p-theme="brutalist"][data-p-resolved="dark"] #page-bot-platform { background:#111111; color:#FFFFFF; }
-html[data-p-theme="brutalist"][data-p-resolved="dark"] :is(.card,.kpi,.bot-card,.legacy-card,.bot-bar,.modal,.inner-tabs) { background:#1D1D1D; color:#FFFFFF; border-color:#FFFFFF; }
+/* Dark materials are global so portaled menus and every module share the palette.
+   Keep accent ink black; hard shadows follow the neutral outlines. */
 html[data-p-theme="brutalist"][data-p-resolved="dark"] {
-  --overview-card-bg:#1D1D1D;
-  --overview-item-bg:#1D1D1D;
-  --overview-card-border:#FFFFFF;
-  --overview-item-border:#FFFFFF;
-  --content-bg:#111111;
-}
-/* 仅校正目标模块的深色内层材质，保留看板现有外观。 */
-html[data-p-theme="brutalist"][data-p-resolved="dark"] :is(#itab-bot-qa,#itab-bot-groups,#itab-bot-seaf,#libPickerModal,#grpPickerModal,#handleMissModal,#reflowedModal,#qaModal) {
+  --border:var(--p-border);
+  --border-strong:var(--p-border);
+  --brutal-shadow:8px 8px 0 var(--p-border);
+  --brutal-shadow-small:4px 4px 0 var(--p-border);
+  --overview-card-bg:var(--surface);
+  --overview-item-bg:var(--surface);
+  --overview-item-hover:var(--surface-soft);
+  --overview-card-border:var(--border);
+  --overview-item-border:var(--border);
+  --overview-divider:var(--border);
+  --content-bg:var(--surface-soft);
+  --sidebar-bg:var(--bg);
   --module-item-bg:var(--surface);
-  --module-item-border:var(--p-border);
+  --module-item-border:var(--border);
   --control-bg:var(--surface);
-  --control-border:var(--p-border);
+  --control-hover-bg:var(--control-bg);
+  --control-border:var(--border);
+  --control-hover-border:var(--brutal-yellow);
+  --select-menu-bg:var(--surface);
+  background:var(--bg);
+}
+html[data-p-theme="brutalist"][data-p-resolved="dark"] :is(body,.wrap,.col-main,.main-shell,#page-bot-platform,.col-left,.p-navigation) {
+  background:var(--bg);
+  color:var(--text);
+  border-color:var(--border);
+}
+/* Keep the content canvas distinct, including the legacy organization shell override. */
+html[data-p-theme="brutalist"][data-p-resolved="dark"] .main-shell {
+  background:var(--content-bg)!important;
+}
+html[data-p-theme="brutalist"][data-p-resolved="dark"] #page-bot-platform {
+  background:var(--content-bg);
+}
+html[data-p-theme="brutalist"][data-p-resolved="dark"] :is(.brand,.user-box) { border-color:var(--border); }
+html[data-p-theme="brutalist"][data-p-resolved="dark"] :is(.card,.kpi,.bot-card,.legacy-card,.bot-bar,.modal,.inner-tabs) {
+  background:var(--surface);
+  color:var(--text);
+  border-color:var(--border);
+}
+html[data-p-theme="brutalist"][data-p-resolved="dark"] :is(.nav-item,.card-title,.topbar .crumbs,.p-module-title h3,.inner-tab) {
   color:var(--text);
 }
-html[data-p-theme="brutalist"][data-p-resolved="dark"] :is(#libPickerModal,#grpPickerModal,#handleMissModal,#reflowedModal,#qaModal) .m-head {
+html[data-p-theme="brutalist"][data-p-resolved="dark"] :is(.nav-item,.p-settings-trigger,.p-collapse):hover {
+  background:var(--nav-hover);
   color:var(--brutal-ink);
 }
-html[data-p-theme="brutalist"][data-p-resolved="dark"] :is(.card-title,.topbar .crumbs,.p-module-title h3) { color:#FFFFFF; }
-html[data-p-theme="brutalist"][data-p-resolved="dark"] :is(input[type="text"],textarea,select,.ui-select-trigger) { background:#1D1D1D; color:#FFFFFF; border-color:#FFFFFF; }
-html[data-p-theme="brutalist"][data-p-resolved="dark"] :is(input[type="text"],textarea,select,.ui-select-trigger):hover,
-html[data-p-theme="brutalist"][data-p-resolved="dark"] :is(input[type="text"],textarea,select,.ui-select-trigger):focus,
-html[data-p-theme="brutalist"][data-p-resolved="dark"] .ui-select-enhanced.is-open .ui-select-trigger { background:var(--brutal-yellow); color:#000000; }
+html[data-p-theme="brutalist"][data-p-resolved="dark"] :is(.nav-item.active,.nav-item:hover,.p-settings-trigger:hover) {
+  border-color:var(--border);
+}
+html[data-p-theme="brutalist"][data-p-resolved="dark"] .modal .m-head {
+  color:var(--brutal-ink);
+}
+html[data-p-theme="brutalist"][data-p-resolved="dark"] .btn:not(.primary,.newbtn):not(:hover) {
+  background:var(--control-bg);
+  color:var(--control-text);
+}
+html[data-p-theme="brutalist"][data-p-resolved="dark"] :is(.btn.primary,.btn.newbtn,.btn:hover) {
+  --ui-control-stroke-color:var(--brutal-ink);
+}
+html[data-p-theme="brutalist"][data-p-resolved="dark"] .btn.p-dialog-close:not(:hover) { background:transparent; }
+html[data-p-theme="brutalist"][data-p-resolved="dark"] :is(input:not([type]),input[type="text"],input[type="search"],input[type="number"],input[type="email"],input[type="password"],textarea,select,.ui-select-trigger),
+html[data-p-theme="brutalist"][data-p-resolved="dark"] :is(input,textarea,select,.ui-select-trigger):is(:hover,:focus),
+html[data-p-theme="brutalist"][data-p-resolved="dark"] .ui-select-enhanced.is-open .ui-select-trigger {
+  background:var(--control-bg);
+  color:var(--control-text);
+  border-color:var(--control-border);
+}
+html[data-p-theme="brutalist"][data-p-resolved="dark"] textarea:is(:hover,:focus) { border-color:var(--control-hover-border); }
+html[data-p-theme="brutalist"][data-p-resolved="dark"] select option { background:var(--select-menu-bg); color:var(--text); }
+html[data-p-theme="brutalist"][data-p-resolved="dark"] select option:checked { background:var(--select-option-selected-bg); color:var(--brutal-ink); }
+html[data-p-theme="brutalist"][data-p-resolved="dark"] select option:hover { background:var(--select-option-hover-bg); color:var(--brutal-ink); }
+html[data-p-theme="brutalist"][data-p-resolved="dark"] #page-bot-platform .bot-tab:not(.active):not(:hover) { color:var(--text); }
+html[data-p-theme="brutalist"][data-p-resolved="dark"] .main-shell:has(#page-bot-platform.active) .page-context-switcher .bot-tab:hover:not(.active),
+html[data-p-theme="brutalist"][data-p-resolved="dark"] .main-shell:has(#page-bot-platform.active) .page-context-switcher .bot-tab:hover:not(.active) .st {
+  color:var(--brutal-ink);
+}
+html[data-p-theme="brutalist"][data-p-resolved="dark"] .main-shell:has(#page-bot-platform.active) .page-context-switcher .inner-tab.active {
+  background:transparent;
+  color:var(--blue);
+  border-bottom-color:var(--blue);
+}
+html[data-p-theme="brutalist"][data-p-resolved="dark"] #page-bot-platform .inner-tab.active::after { background:var(--blue); }
 html[data-p-theme="brutalist"][data-p-resolved="dark"] .ui-table-scroll > table th,
 html[data-p-theme="brutalist"][data-p-resolved="dark"] #page-legacy-org .org-table th,
 html[data-p-theme="brutalist"][data-p-resolved="dark"] #page-legacy-org .org-table th:nth-child(-n+2),
-html[data-p-theme="brutalist"][data-p-resolved="dark"] #page-legacy-org .org-table th:last-child { color:#FFFFFF; border-color:#FFFFFF; }
+html[data-p-theme="brutalist"][data-p-resolved="dark"] #page-legacy-org .org-table th:last-child { color:var(--text); border-color:var(--border); }
 html[data-p-theme="brutalist"][data-p-resolved="dark"] .ui-table-scroll > table td,
 html[data-p-theme="brutalist"][data-p-resolved="dark"] #page-legacy-org .org-table td,
 html[data-p-theme="brutalist"][data-p-resolved="dark"] #page-legacy-org .org-table td:nth-child(-n+2),
-html[data-p-theme="brutalist"][data-p-resolved="dark"] #page-legacy-org .org-table td:last-child { background:#1D1D1D; color:#FFFFFF; border-color:#FFFFFF; }
+html[data-p-theme="brutalist"][data-p-resolved="dark"] #page-legacy-org .org-table td:last-child { background:var(--module-item-bg); color:var(--text); border-color:var(--border); }
 html[data-p-theme="brutalist"][data-p-resolved="dark"] .ui-table-scroll > table:is(.org-table,.ui-data-table) tr:hover td,
 html[data-p-theme="brutalist"][data-p-resolved="dark"] #page-legacy-org .org-table tr:hover td,
 html[data-p-theme="brutalist"][data-p-resolved="dark"] #page-legacy-org .org-table tr:hover td:nth-child(-n+2),
-html[data-p-theme="brutalist"][data-p-resolved="dark"] #page-legacy-org .org-table tr:hover td:last-child { background:var(--brutal-violet); color:#000000; }
-html[data-p-theme="brutalist"][data-p-resolved="dark"] .ui-select-menu { background:#1D1D1D; border-color:#FFFFFF; }
-html[data-p-theme="brutalist"][data-p-resolved="dark"] .ui-select-option { color:#FFFFFF; }
+html[data-p-theme="brutalist"][data-p-resolved="dark"] #page-legacy-org .org-table tr:hover td:last-child {
+  --text:var(--brutal-ink);
+  --muted:var(--brutal-ink);
+  --faint:var(--brutal-ink);
+  --blue:var(--brutal-ink);
+  --control-text:var(--brutal-ink);
+  --control-bg:var(--brutal-violet);
+  --control-border:var(--brutal-ink);
+  background:var(--brutal-violet);
+  color:var(--brutal-ink);
+}
+html[data-p-theme="brutalist"][data-p-resolved="dark"] .ui-select-menu { background:var(--select-menu-bg); border-color:var(--border); }
+html[data-p-theme="brutalist"][data-p-resolved="dark"] .ui-select-option { color:var(--text); }
 html[data-p-theme="brutalist"][data-p-resolved="dark"] .ui-select-option[aria-selected="true"],
 html[data-p-theme="brutalist"][data-p-resolved="dark"] .ui-select-option:hover,
 html[data-p-theme="brutalist"][data-p-resolved="dark"] .ui-select-option:focus-visible { color:var(--brutal-ink); }

@@ -11,7 +11,7 @@
   --primary-foreground:#fff; --surface-hover:#eeeef0;
   --control-bg:var(--surface); --control-hover-bg:var(--surface-hover);
   --control-border:var(--border-strong); --control-hover-border:var(--border-strong); --control-text:var(--text);
-  --select-menu-bg:var(--surface); --select-option-hover-bg:var(--surface-hover);
+  --select-menu-bg:var(--surface); --select-option-hover-bg:var(--nav-hover);
   --select-option-selected-bg:var(--blue-soft);
   --primary-bg:var(--blue); --primary-hover-bg:var(--blue-deep); --primary-text:var(--primary-foreground);
   --nav-hover:#f5f6f7;
