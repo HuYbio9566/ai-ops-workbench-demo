@@ -84,7 +84,7 @@ html[data-p-theme] .main-shell { background:var(--surface); }
 /* 默认浅色主题：导航保持白色，内容容器使用独立的浅灰画布。 */
 html[data-p-theme="default"][data-p-resolved="light"] {
   --p-dialog-bg:var(--surface-soft);
-  --content-bg:var(--bg);
+  --content-bg:#f7f9fa;
   --overview-card-bg:#fff;
   --nav-active-bg:#eef5ff;
   --table-row-hover-bg:#f5f6f7;
@@ -107,7 +107,7 @@ html[data-p-theme="default"][data-p-resolved="dark"] .main-shell {
   background:var(--content-bg)!important;
 }
 html[data-p-theme="default"][data-p-resolved="light"] :is(.col-left,.p-navigation) { background:var(--surface-soft)!important; }
-html[data-p-theme="default"][data-p-resolved="light"] .col-main { background:var(--bg)!important; }
+html[data-p-theme="default"][data-p-resolved="light"] .col-main { background:var(--surface-soft)!important; }
 html[data-p-theme="default"][data-p-resolved="light"] :is(.modal,.modal .m-head,.p-dialog) { background:var(--surface-soft); }
 html[data-p-theme="default"][data-p-resolved="light"] .main-shell { background:var(--content-bg)!important; }
 html[data-p-theme="default"][data-p-resolved="light"] .main-shell:has(#page-legacy-overview.active) { background:var(--content-bg)!important; }
@@ -141,7 +141,7 @@ html[data-p-theme="default"][data-p-resolved="light"] .main-shell:has(#page-lega
 html[data-p-theme="default"][data-p-resolved="light"] #page-legacy-feedback > .legacy-card,
 html[data-p-theme="default"][data-p-resolved="light"] #page-legacy-knowledge > .legacy-card,
 html[data-p-theme="default"][data-p-resolved="light"] #page-legacy-tuitui > .legacy-card { background:transparent!important; }
-html[data-p-theme="default"][data-p-resolved="light"][data-p-style="embedded"] body:has(#page-legacy-feedback.active) .col-main { background:transparent!important; }
+html[data-p-theme="default"][data-p-resolved="light"][data-p-style="embedded"] body:has(#page-legacy-feedback.active) .col-main { background:var(--bg)!important; }
 html[data-p-theme="default"] #page-bot-platform #itab-bot-overview > .card,
 html[data-p-theme="default"] #page-bot-platform #itab-bot-overview > .grid > .card {
   background:var(--overview-card-bg);
