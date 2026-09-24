@@ -412,7 +412,7 @@ body:has(#page-legacy-feedback.active) .col-main { background:var(--bg)!importan
 #page-bot-platform, .main-shell:has(#page-bot-platform.active) { background:var(--surface); }
 .main-shell:has(#page-bot-platform.active) { padding:20px; }
 .main-shell:has(#page-bot-platform.active) .topbar { margin-bottom:4px; }
-.main-shell:has(#page-bot-platform.active) .topbar .crumbs { color:var(--overview-heading); font-size:24px; line-height:32px; font-weight:600; }
+.main-shell:has(#page-bot-platform.active) .topbar .crumbs { color:var(--overview-heading); font-size:var(--ui-page-title-size); line-height:32px; font-weight:600; }
 #page-bot-platform .bot-bar { background:transparent; border:0; box-shadow:none; padding:0!important; margin:0 0 24px; }
 #page-bot-platform .bot-tabs { display:flex; height:40px; gap:4px; flex-wrap:nowrap; overflow-x:auto; border-bottom:0; }
 #page-bot-platform .bot-tabs { background:var(--overview-tab-bg); }
@@ -573,7 +573,7 @@ body:has(#page-legacy-feedback.active) .col-main { background:var(--bg)!importan
   .col-main { height:auto; overflow:visible; min-width:0; padding:12px; }
   .nav-panel { overflow:visible; }
   .card { padding:12px; }
-  .topbar .crumbs { font-size:18px; line-height:28px; }
+  .topbar .crumbs { font-size:var(--ui-page-title-size); line-height:28px; }
   .modal { max-width:calc(100vw - 24px); }
 }
 
@@ -734,6 +734,10 @@ body:has(#page-legacy-feedback.active) .col-main { background:var(--bg)!importan
 }
 #page-bot-platform #grpCards .bot-card {
   color:var(--text);
+}
+#page-bot-platform #kbLibCards .bot-card:hover {
+  background:var(--module-item-bg, var(--surface));
+  border-color:var(--blue);
 }
 #page-bot-platform #grpCards .bot-card .b-sub,
 #page-bot-platform #grpCards .bot-card .b-row {

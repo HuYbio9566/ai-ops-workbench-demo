@@ -1,5 +1,5 @@
 /* 中文阅读与交互呈现层。保留原 HTML 样式标记，供既有编辑脚本定位。 */
-:root { --faint:#64748b; --shadow-soft:none; }
+:root { --faint:#64748b; --shadow-soft:none; --ui-page-title-size:20px; }
 body {
   font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",sans-serif;
   font-size:14px;
@@ -20,7 +20,7 @@ b,strong { font-weight:600; }
 .nav-item,.nav-item.active,.inner-tab,.inner-tab.active,.bot-tab.active { font-weight:500; }
 .nav-item.active::before { display:none; }
 .topbar { flex-wrap:wrap; margin-bottom:20px; }
-.topbar .crumbs { font-size:20px; line-height:30px; font-weight:600; color:var(--text); overflow-wrap:anywhere; }
+.topbar .crumbs { font-size:var(--ui-page-title-size); line-height:30px; font-weight:600; color:var(--text); overflow-wrap:anywhere; }
 .card { border-radius:8px; padding:20px; margin-bottom:20px; }
 .card-title { font-size:16px; line-height:24px; font-weight:600; gap:12px; flex-wrap:wrap; margin-bottom:16px; }
 .card-title[style*="font-size:13px"] { font-size:14px!important; line-height:22px; }
@@ -51,6 +51,7 @@ b,strong { font-weight:600; }
 select,input[type=text],textarea { font-size:14px; min-height:36px; max-width:100%; }
 table { font-size:14px; line-height:22px; }
 th,td { padding:12px; vertical-align:top; }
+td { vertical-align:middle; }
 td { overflow-wrap:anywhere; }
 .notice { font-size:14px; line-height:23px; }
 .modal { border-radius:10px; overscroll-behavior:contain; }
