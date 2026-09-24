@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" href="data:,">
-<script src="./personalization-state.js?v=20260911-3"></script>
+<script src="./personalization-state.js?v=20260917-public-defaults-v2"></script>
 <title>数字人运营平台 · 业务开放版原型 v3</title>
 <script src="./chart.umd.min.js"></script>
 
@@ -222,10 +222,12 @@ select,input[type=text]{padding:7px 10px;border:1px solid var(--border-strong);b
 .user-message .unread-dot { position:absolute; top:6px; right:6px; width:6px; height:6px; border-radius:50%; background:#e5484d; border:1.5px solid var(--surface); }
 .u-role,.user-box .lb { display:none; }
 </style>
-<link rel="stylesheet" href="./ui-typography.css?v=20260917-table-align-1">
-<link rel="stylesheet" href="./workbench.css?v=20260916-nav-clamp-1">
-<link rel="stylesheet" href="./personalization.css?v=20260916-settings-border-1">
-<link rel="stylesheet" href="./personalization-factory.css?v=20260914-font-select-1">
+<link rel="stylesheet" href="./ui-typography.css?v=20260917-card-subtitle-ellipsis">
+<link rel="stylesheet" href="./workbench.css?v=20260917-table-fixed-shadow">
+<link rel="stylesheet" href="./personalization.css?v=20260917-user-hover">
+<link rel="stylesheet" href="./personalization-factory.css?v=20260917-modal-header">
+<link rel="stylesheet" href="./knowledge-reflow.css?v=20260917-reflow-columns">
+<link rel="stylesheet" href="./controls.css?v=20260917-reflow-form-spacing">
 </head>
 <body>
 <div class="wrap">
@@ -249,7 +251,7 @@ select,input[type=text]{padding:7px 10px;border:1px solid var(--border-strong);b
       <button class="nav-item legacy-item" data-page="legacy-skillhub" data-icon="Grid"><span class="nav-icon" aria-hidden="true"></span>SkillHub 运营</button>
 
       <div class="nav-sec" style="margin-top:14px">业务运营平台</div>
-      <button class="nav-item new-item admin-item" data-page="bot-platform" data-entry="overview" data-icon="DataAnalysis"><span class="nav-icon" aria-hidden="true"></span>总览 <span class="tag blue" style="margin-left:auto">超管</span></button>
+      <button class="nav-item new-item admin-item" data-page="bot-platform" data-entry="overview" data-icon="DataAnalysis"><span class="nav-icon" aria-hidden="true"></span>总览超管</button>
       <button class="nav-item new-item biz-item" data-page="bot-platform" data-entry="it" data-icon="Cpu"><span class="nav-icon" aria-hidden="true"></span>IT业务</button>
       <button class="nav-item new-item biz-item" data-page="bot-platform" data-entry="admin" data-icon="OfficeBuilding"><span class="nav-icon" aria-hidden="true"></span>行政业务</button>
       <button class="nav-item new-item biz-item" data-page="bot-platform" data-entry="jingfen" data-icon="TrendCharts"><span class="nav-icon" aria-hidden="true"></span>经分业务</button>
@@ -322,9 +324,9 @@ select,input[type=text]{padding:7px 10px;border:1px solid var(--border-strong);b
         <div class="card-title">组织架构与权限</div>
         <div class="org-toolbar">
           <span class="org-filters">
-            <input type="text" id="orgSearch" placeholder="搜索姓名、账号、部门…" style="flex:1;min-width:200px" oninput="renderOrg()">
-            <span class="org-dept-select-wrap"><select id="orgDeptFilter" onchange="renderOrg()"></select><i data-lucide="chevron-down" aria-hidden="true"></i></span>
-            <span class="org-dept-select-wrap"><select id="orgRoleFilter" onchange="renderOrg()">
+            <input type="text" id="orgSearch" placeholder="搜索姓名、账号、部门…" style="flex:1;min-width:200px" oninput="renderOrg(true)">
+            <span class="org-dept-select-wrap"><select id="orgDeptFilter" onchange="renderOrg(true)"></select><i data-lucide="chevron-down" aria-hidden="true"></i></span>
+            <span class="org-dept-select-wrap"><select id="orgRoleFilter" onchange="renderOrg(true)">
               <option value="">全部角色</option>
               <option value="super_admin">超级管理员</option>
               <option value="admin">管理员</option>
@@ -334,16 +336,30 @@ select,input[type=text]{padding:7px 10px;border:1px solid var(--border-strong);b
           </span>
           <span class="org-actions"><button class="btn sm" onclick="openGrantBatchModal()">批量授予</button><button class="btn primary sm" onclick="syncOrg()">同步组织架构</button></span>
         </div>
-        <div class="org-table-scroll">
+        <div class="org-table-scroll ui-table-scroll" role="region" aria-label="组织架构与权限表格">
         <table class="org-table">
           <thead><tr>
-            <th style="width:48px"><input type="checkbox" id="orgSelAll" onchange="toggleOrgAll(this)"></th>
+            <th style="width:48px"><input type="checkbox" id="orgSelAll" aria-label="全选当前页成员" onchange="toggleOrgAll(this)"></th>
             <th>姓名</th><th>账号</th><th>部门</th><th>部门路径</th><th>角色</th>
             <th style="min-width:280px">业务运营平台权限（业务 → 数字人 → 功能模块）</th><th>操作</th>
           </tr></thead>
           <tbody id="orgTable"></tbody>
         </table>
         </div>
+        <nav class="org-pagination" aria-label="组织成员分页">
+          <span id="orgPageSummary" aria-live="polite"></span>
+          <div class="org-pagination-controls">
+            <label for="orgPageSize">每页条数</label>
+            <span class="org-dept-select-wrap"><select id="orgPageSize" onchange="changeOrgPageSize(this.value)">
+              <option value="10">10</option><option value="20">20</option><option value="30">30</option><option value="40">40</option><option value="50">50</option><option value="custom">自定义</option>
+            </select><i data-lucide="chevron-down" aria-hidden="true"></i></span>
+            <input id="orgCustomPageSize" type="text" inputmode="numeric" aria-label="自定义每页条数" value="10" hidden onchange="setOrgPageSize(this.value)" onkeydown="if(event.key==='Enter')this.blur()">
+            <button id="orgPrevPage" class="btn sm" title="上一页" aria-label="上一页" onclick="goOrgPage(orgPage-1)"><i data-lucide="chevron-left" aria-hidden="true"></i></button>
+            <input id="orgPageNumber" type="text" inputmode="numeric" aria-label="当前页码" value="1" onchange="goOrgPage(this.value)" onkeydown="if(event.key==='Enter')this.blur()">
+            <span id="orgPageTotal"></span>
+            <button id="orgNextPage" class="btn sm" title="下一页" aria-label="下一页" onclick="goOrgPage(orgPage+1)"><i data-lucide="chevron-right" aria-hidden="true"></i></button>
+          </div>
+        </nav>
         <div class="hint-text">组织架构从组织系统同步；角色 4 档：<b>普通用户</b> / <b>可访问</b> / <b>管理员</b> / <b>超级管理员</b>。业务运营平台权限已融入本页：点「设置权限」配置 ① 可访问业务 → ② 数字人 → ③ 功能模块（运营看板 / 问题记录&amp;知识回流 / 群聊&amp;频道运营 / Seaf 运营观测）；超级管理员默认全部权限（内置）。</div>
       </div>
 
@@ -351,8 +367,8 @@ select,input[type=text]{padding:7px 10px;border:1px solid var(--border-strong);b
         <div class="card-title bot-config-title">数字人接入管理</div>
         <div class="bot-config-toolbar">
           <div class="bot-config-filters">
-            <input type="text" id="botConfigSearch" placeholder="搜索数字人、所属业务…" oninput="renderConfig()">
-            <span class="org-dept-select-wrap"><select id="botConfigStatus" onchange="renderConfig()">
+            <input type="text" id="botConfigSearch" placeholder="搜索数字人、所属业务…" oninput="renderConfig(true)">
+            <span class="org-dept-select-wrap"><select id="botConfigStatus" onchange="renderConfig(true)">
               <option value="">全部状态</option>
               <option value="已上线">已上线</option>
               <option value="已接入">已接入</option>
@@ -361,10 +377,26 @@ select,input[type=text]{padding:7px 10px;border:1px solid var(--border-strong);b
           </div>
           <div class="bot-config-actions"><button class="btn primary sm" onclick="openBotModal()">接入新数字人</button></div>
         </div>
-        <table>
-          <thead><tr><th>数字人</th><th>所属业务</th><th>状态</th><th>同步频率</th><th>操作</th></tr></thead>
+        <div class="ui-table-scroll" role="region" aria-label="数字人接入管理表格">
+        <table class="ui-data-table has-actions">
+          <thead><tr><th>数字人</th><th>所属业务</th><th data-column="compact">状态</th><th>同步频率</th><th>操作</th></tr></thead>
           <tbody id="cfgBotTable"></tbody>
         </table>
+        </div>
+        <nav class="org-pagination" aria-label="数字人接入管理分页">
+          <span id="cfgPageSummary" aria-live="polite"></span>
+          <div class="org-pagination-controls">
+            <label for="cfgPageSize">每页条数</label>
+            <span class="org-dept-select-wrap"><select id="cfgPageSize" onchange="changeConfigPageSize(this.value)">
+              <option value="10">10</option><option value="20">20</option><option value="30">30</option><option value="40">40</option><option value="50">50</option><option value="custom">自定义</option>
+            </select><i data-lucide="chevron-down" aria-hidden="true"></i></span>
+            <input id="cfgCustomPageSize" type="text" inputmode="numeric" aria-label="自定义每页数字人条数" value="10" hidden onchange="setConfigPageSize(this.value)" onkeydown="if(event.key==='Enter')this.blur()">
+            <button id="cfgPrevPage" class="btn sm" title="上一页" aria-label="上一页" onclick="goConfigPage(cfgPage-1)"><i data-lucide="chevron-left" aria-hidden="true"></i></button>
+            <input id="cfgPageNumber" type="text" inputmode="numeric" aria-label="数字人列表当前页码" value="1" onchange="goConfigPage(this.value)" onkeydown="if(event.key==='Enter')this.blur()">
+            <span id="cfgPageTotal"></span>
+            <button id="cfgNextPage" class="btn sm" title="下一页" aria-label="下一页" onclick="goConfigPage(cfgPage+1)"><i data-lucide="chevron-right" aria-hidden="true"></i></button>
+          </div>
+        </nav>
         <div class="hint-text">通用配置：接入数字人时选择所属业务，配置完成后数字人出现在对应业务的「业务运营平台」入口下；数据源自动从该数字人拉取（无需单独配置数据源）。再在上方「组织架构与权限」中给用户授予角色并配置该数字人权限，用户登录后即可在对应业务下看到并运营。</div>
       </div>
     </div>
@@ -463,49 +495,52 @@ select,input[type=text]{padding:7px 10px;border:1px solid var(--border-strong);b
           <div class="grid grid-5" id="kbLibCards"></div>
         </div>
 
-        <!-- ③ 知识回流（核心操作区）：未命中（缺口/互联网答案）→ 确认 → 回流知识库 -->
-        <div class="card" style="margin-top:14px">
-          <div class="card-title" style="font-size:16px;justify-content:flex-start;gap:8px">知识回流 <span class="info-ic tip-left" data-tip="数字人未命中知识库时，自动搜索互联网作答（回答末尾带「来自互联网」标识），系统识别后自动进入下方回流队列，由管理员判断是否回流；群里的人工回答不再纳入回流队列（无法准确对应到用户问题）。未命中且无互联网回答的问题（缺口）可手动加入补录。流程：① 看回流队列（互联网答案自动进入 / 缺口手动加入）→ ② 编辑确认答案 → ③ 一键回流（FAQ 型库直接加问答对，文档型库聚合 FAQ 文档）">?</span></div>
-          <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center">
-            <select id="reflowSrcSel" aria-label="问题来源" style="width:140px"><option value="">全部来源</option><option value="群聊">群聊</option><option value="频道">频道</option></select>
-            <span class="hint-text" style="margin-left:auto;text-align:right">回流到哪个知识库：在右侧「回流队列」中选择</span>
+        <!-- ③ 知识回流：处理 → 待同步 → 已回流知识 -->
+        <div class="card rf-section">
+          <div class="card-title rf-heading">知识回流
+            <span class="info-ic tip-left" data-tip="处理问题并选择目标知识库，确认后进入待同步表；勾选同步后入库。已回流知识修改后需再次同步。">?</span>
+            <button class="btn sm" onclick="openReflowed()"><i data-lucide="book-open" aria-hidden="true"></i>已回流知识 <span id="reflowedCount">0</span></button>
           </div>
-          <div class="grid grid-2">
-            <div style="border:1px solid var(--border);border-radius:10px;padding:10px 12px">
-              <div class="card-title" style="font-size:13px">① 未命中问题 <span class="info-ic" data-tip="未命中知识库且无互联网回答的问题（缺口）· 点击加入回流队列，填写答案后回流">?</span></div>
-              <div id="missQa" class="grid" style="gap:6px"></div>
-            </div>
-            <div style="border:1px solid var(--border);border-radius:10px;padding:10px 12px">
-              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:6px">
-                <div class="card-title" style="font-size:13px">② 回流队列 <span class="info-ic" data-tip="确认后写入目标知识库">?</span></div>
-                <div style="display:flex;gap:8px;align-items:center" id="reflowSelBar">
-                  <label style="display:flex;align-items:center;gap:4px;font-size:13px;cursor:pointer"><input type="checkbox" id="reflowSelAll" onchange="toggleReflowAll(this)"> 全选</label>
-                  <button class="btn primary sm" onclick="batchReflow()">批量回流 <span id="reflowSelCount">0</span></button>
-                </div>
+          <div class="rf-columns">
+            <section class="rf-column">
+              <div class="rf-toolbar"><h3>① 未命中问题</h3><select id="missSrcSel" aria-label="未命中问题来源" onchange="renderMissQa()"></select></div>
+              <div id="missQa"></div>
+            </section>
+            <section class="rf-column">
+              <div class="rf-toolbar"><h3>② 待同步表</h3>
+                <label class="rf-select"><input type="checkbox" id="reflowSelAll" onchange="togglePendingAll(this)">全选</label>
+                <button id="syncPendingButton" class="btn primary sm" onclick="syncPending()" disabled>同步到知识库 <span id="reflowSelCount">0</span></button>
               </div>
-              <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap">
-                <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);cursor:pointer"><b style="color:var(--text)">回流到知识库</b>
-                  <select id="reflowLibSel" style="width:240px"></select>
-                </label>
-                <span class="info-ic" style="flex:none" id="reflowHint" data-tip="选择目标知识库（FAQ 型→加问答对；文档型→聚合文档）">?</span>
-              </div>
-              <div id="reflowList" style="display:grid;gap:8px;max-height:400px;overflow-y:auto"></div>
-            </div>
+              <div id="pendingList"></div>
+            </section>
           </div>
+          <div id="reflowStatus" role="status" aria-live="polite"></div>
         </div>
 
         <!-- ④ 历史问答检索（命中状态可准确判断） -->
         <div class="card" style="margin-top:14px">
           <div class="card-title">历史问答检索 <span class="info-ic" data-tip="「命中」= 回答引用了知识库内容（可从日志准确判断）">?</span></div>
-          <div style="display:flex;gap:8px;margin-bottom:12px">
+          <div class="qa-history-toolbar">
             <input type="text" id="qaSearch" placeholder="搜索问题 / 关键词 / 用户…" style="flex:0 1 240px;width:240px;min-width:0">
             <select id="qaStatus"><option value="">全部命中状态</option><option>已命中</option><option>未命中</option></select>
-            <button class="btn primary sm" onclick="renderQA()">查询</button>
           </div>
-          <div style="max-height:340px;overflow-y:auto">
-            <table><thead><tr><th>时间</th><th>用户</th><th>问题</th><th>命中</th><th>操作</th></tr></thead><tbody id="qaTable"></tbody></table>
+          <div class="ui-table-scroll" role="region" aria-label="历史问答检索表格">
+            <table class="qa-history-table ui-data-table has-actions"><thead><tr><th data-column="time">时间</th><th>用户</th><th data-column="text">问题</th><th data-column="compact">命中</th><th>操作</th></tr></thead><tbody id="qaTable"></tbody></table>
           </div>
-          <div class="hint-text" id="qaCount"></div>
+          <nav class="qa-pagination" aria-label="问答记录分页">
+            <span id="qaCount" aria-live="polite"></span>
+            <div class="qa-pagination-controls">
+              <label for="qaPageSize">每页条数</label>
+              <select id="qaPageSize" onchange="changeQAPageSize(this.value)">
+                <option value="10">10</option><option value="20">20</option><option value="30">30</option><option value="40">40</option><option value="50">50</option><option value="custom">自定义</option>
+              </select>
+              <input id="qaCustomPageSize" type="text" inputmode="numeric" aria-label="自定义每页问答条数" value="10" hidden onchange="setQAPageSize(this.value)" onkeydown="if(event.key==='Enter')this.blur()">
+              <button id="qaPrevPage" class="btn sm" title="上一页" aria-label="上一页" onclick="goQAPage(qaPage-1)"><i data-lucide="chevron-left" aria-hidden="true"></i></button>
+              <input id="qaPageNumber" type="text" inputmode="numeric" aria-label="问答当前页码" value="1" onchange="goQAPage(this.value)" onkeydown="if(event.key==='Enter')this.blur()">
+              <span id="qaPageTotal"></span>
+              <button id="qaNextPage" class="btn sm" title="下一页" aria-label="下一页" onclick="goQAPage(qaPage+1)"><i data-lucide="chevron-right" aria-hidden="true"></i></button>
+            </div>
+          </nav>
         </div>
       </div>
 
@@ -572,11 +607,11 @@ select,input[type=text]{padding:7px 10px;border:1px solid var(--border-strong);b
         <option value="admin" selected>管理员</option>
         <option value="super_admin">超级管理员</option>
       </select>
-      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:24px">
+    </div>
+      <div class="m-foot">
         <button class="btn" onclick="closeModal('grantBatchModal')">取消</button>
         <button class="btn primary" onclick="grantBatch()">确认授予</button>
       </div>
-    </div>
   </div>
 </div>
 
@@ -597,8 +632,9 @@ select,input[type=text]{padding:7px 10px;border:1px solid var(--border-strong);b
     <div class="m-head"><b>指标口径说明</b><button class="xbtn" onclick="closeModal('metricModal')">×</button></div>
     <div class="m-body">
       <div class="notice" style="margin-bottom:12px">所有指标以<strong>数字人日志</strong>为统计来源（无需监控群聊全量消息）。口径需与业务方确认后固化。</div>
-      <table>
-        <thead><tr><th style="width:120px">指标</th><th style="width:300px">口径定义</th><th>口径价值（业务视角）</th></tr></thead>
+      <div class="ui-table-scroll" role="region" aria-label="指标口径说明表格">
+      <table class="ui-data-table">
+        <thead><tr><th style="width:120px">指标</th><th data-column="text" style="width:300px">口径定义</th><th data-column="text">口径价值（业务视角）</th></tr></thead>
         <tbody>
           <tr><td><b>回复量</b></td><td>数字人<strong>实际回复的条数</strong>：单聊每次回复=1条；群聊仅统计数字人被@/被提问且实际回复的，未回复的不计入</td><td>数字人真实工作量，不被群聊无关消息灌水</td></tr>
           <tr><td><b>会话数</b></td><td><strong>连续交互片段数</strong>：同一用户与数字人 30 分钟内连续问答=1个会话；超过 30 分钟无交互再提问=新会话；群聊按用户维度切分</td><td>用户开启对话的次数，1 个会话可含多轮问答</td></tr>
@@ -609,17 +645,47 @@ select,input[type=text]{padding:7px 10px;border:1px solid var(--border-strong);b
           <tr><td><b>高频问题覆盖率</b></td><td>TOP 高频问题中<strong>已有对应知识条目</strong>的比例</td><td>高频问题是否被覆盖，缺口=优先补录清单</td></tr>
         </tbody>
       </table>
+      </div>
       <div class="hint-text" style="margin-top:10px">✅ 口径已确认：会话超时窗口 <strong>30 分钟</strong>；群聊按<strong>用户维度</strong>切分；负向反馈关键词表由<strong>平台维护</strong>（默认词表，业务侧无需配置）；命中率/轮次/解决率等占比比值指标<strong>按所选时间窗口统计</strong>（7/30/90 天取值不同）。</div>
     </div>
   </div>
 </div>
 
 <!-- ============ 弹窗：问答明细 ============ -->
+<div class="modal-mask" id="handleMissModal" role="dialog" aria-modal="true" aria-labelledby="hmTitle">
+  <div class="modal">
+    <div class="m-head"><b id="hmTitle">处理未命中问题</b><button class="xbtn" aria-label="关闭" onclick="cancelHandleMiss()">×</button></div>
+    <div class="m-body">
+      <div id="hmSource" class="rf-meta"></div>
+      <label class="rf-field">问题<input type="text" id="hmQ" readonly></label>
+      <label class="rf-field"><span>补充答案 <span class="rf-error" aria-hidden="true">*</span></span><textarea id="hmA" placeholder="填写标准答案" required></textarea></label>
+      <label class="rf-field"><span>目标知识库 <span class="rf-error" aria-hidden="true">*</span></span><select id="hmLib" required></select></label>
+      <div id="hmError" class="rf-error" role="alert"></div>
+    </div>
+    <div class="m-foot"><button class="btn" onclick="cancelHandleMiss()">取消</button><button id="hmSubmit" class="btn primary" onclick="confirmHandleMiss()">确认，加入待同步表</button></div>
+  </div>
+</div>
+<div class="modal-mask" id="reflowedModal" role="dialog" aria-modal="true" aria-labelledby="reflowedTitle">
+  <div class="modal">
+    <div class="m-head"><b id="reflowedTitle">已回流知识 · <span id="reflowedBotName"></span></b><button class="xbtn" aria-label="关闭" onclick="closeModal('reflowedModal')">×</button></div>
+    <div class="m-body">
+      <div class="rf-toolbar">
+        <input type="text" id="reflowedSearch" aria-label="搜索已回流知识" placeholder="搜索问题 / 答案关键词" oninput="renderReflowed()">
+        <select id="reflowedLibSel" aria-label="筛选知识库" onchange="renderReflowed()"></select>
+        <span id="reflowedFilterCount" class="tag">0 条</span>
+      </div>
+      <div id="reflowedPanel"></div>
+      <div id="reflowedStatus" class="rf-status" role="status"></div>
+    </div>
+  </div>
+</div>
 <div class="modal-mask" id="qaModal">
   <div class="modal">
     <div class="m-head"><b>问答明细 · 下钻</b><button class="xbtn" onclick="closeModal('qaModal')">×</button></div>
     <div class="m-body">
-      <table><thead><tr><th>时间</th><th>用户</th><th>问题</th><th>回答</th><th>解决</th></tr></thead><tbody id="qaModalBody"></tbody></table>
+      <div class="ui-table-scroll" role="region" aria-label="问答明细表格">
+      <table class="ui-data-table"><thead><tr><th data-column="time">时间</th><th>用户</th><th data-column="text">问题</th><th data-column="text">回答</th><th data-column="compact">解决</th></tr></thead><tbody id="qaModalBody"></tbody></table>
+      </div>
       <div class="hint-text">原型示意：真实场景每个汇总（回复量/会话数/主动解决率）都可下钻到这一层的明细。</div>
     </div>
   </div>
@@ -654,12 +720,12 @@ select,input[type=text]{padding:7px 10px;border:1px solid var(--border-strong);b
     <div class="m-body">
       <div class="hint-text" style="margin-bottom:12px">三级权限：<strong>一级</strong> = 可访问的业务运营平台业务 → <strong>二级</strong> = 该业务下可访问的数字人 → <strong>三级</strong> = 该数字人下的功能模块。勾选业务后其下数字人默认全选，可单独调整；未勾选的业务其下数字人/模块不可用。</div>
       <div id="permTree" style="display:grid;gap:12px;max-height:440px;overflow-y:auto"></div>
-      <div style="display:flex;gap:10px;margin-top:16px">
+      <div class="hint-text" style="margin-top:16px">保存后，用户登录「业务运营平台」即按此权限看到对应业务 / 数字人 / 功能模块</div>
+    </div>
+      <div class="m-foot">
         <button class="btn primary" onclick="savePerm()">保存</button>
         <button class="btn" onclick="closeModal('permModal')">取消</button>
-        <span class="hint-text" style="margin-left:auto">保存后，用户登录「业务运营平台」即按此权限看到对应业务 / 数字人 / 功能模块</span>
       </div>
-    </div>
   </div>
 </div>
 
@@ -691,11 +757,11 @@ select,input[type=text]{padding:7px 10px;border:1px solid var(--border-strong);b
           </select>
         </label>
       </div>
-      <div style="display:flex;gap:10px;margin-top:16px">
+    </div>
+      <div class="m-foot">
         <button class="btn primary" onclick="addBot()">确认接入</button>
         <button class="btn" onclick="closeModal('botModal')">取消</button>
       </div>
-    </div>
   </div>
 </div>
 
@@ -715,13 +781,13 @@ select,input[type=text]{padding:7px 10px;border:1px solid var(--border-strong);b
         <select id="aiLibSel" style="flex:1"></select>
       </div>
       <div id="aiDocs" style="display:grid;gap:10px"></div>
-      <div style="display:flex;gap:10px;margin-top:14px;align-items:center">
-        <button class="btn primary" id="aiConfirmBtn" onclick="confirmAIChip(this)">确认上传所选文档</button>
-        <button class="btn" onclick="closeModal('aiModal')">取消</button>
-        <span class="hint-text">确认后上传到上方选择的知识库</span>
-      </div>
+      <div class="hint-text" style="margin-top:10px">确认后上传到上方选择的知识库</div>
       <div class="hint-text" style="margin-top:10px">铁律：AI 只起草、不落库；人工改过的字段 AI 永不覆盖。文档上传前可编辑/删除，确认后进入「解析中」→「已解析」。</div>
     </div>
+      <div class="m-foot">
+        <button class="btn primary" id="aiConfirmBtn" onclick="confirmAIChip(this)">确认上传所选文档</button>
+        <button class="btn" onclick="closeModal('aiModal')">取消</button>
+      </div>
   </div>
 </div>
 
@@ -730,6 +796,7 @@ select,input[type=text]{padding:7px 10px;border:1px solid var(--border-strong);b
   <div class="modal">
     <div class="m-head"><b>运营报告 · AI 草稿</b><button class="xbtn" onclick="closeModal('reportModal')">×</button></div>
     <div class="m-body" id="reportBody"></div>
+    <div class="m-foot" id="reportActions"></div>
   </div>
 </div>
 
@@ -750,15 +817,16 @@ select,input[type=text]{padding:7px 10px;border:1px solid var(--border-strong);b
           <select id="reportPeriod"></select>
         </label>
         <div class="hint-text" id="reportLimitHint">周报支持最近 8 周 · 月报支持最近 6 个月</div>
-        <div style="display:flex;justify-content:flex-end;gap:8px">
+      </div>
+    </div>
+        <div class="m-foot">
           <button class="btn" onclick="closeModal('reportConfigModal')">取消</button>
           <button class="btn primary" onclick="genReport()">生成草稿</button>
         </div>
-      </div>
-    </div>
   </div>
 </div>
 
+<script src="./knowledge-reflow.js?v=20260917-source-label"></script>
 <script>
 /* ══════════════ 模拟数据（脱敏，原型用） ══════════════ */
 const BOTS = {
@@ -1017,13 +1085,31 @@ const CLASS_DIST = {
   testB:  { labels:['流程审批','流程卡顿','流程修改','审批超时','其他'], data:[40,24,16,12,8] },
   security:{ labels:['入侵防护','网络准入','身份认证','告警处置','合规要求','其他'], data:[28,22,18,15,12,5] },
 };
-// 未命中问题（未命中知识库且无互联网回答 → 缺口，点击加入回流队列补录）
+// 未命中问题保留群聊/频道来源，供知识回流按来源筛选。
 const MISS_QA = {
-  it:     ['如何批量重置部门内多名员工的 VPN？','VPN 登录后无法访问内网特定系统','旧电脑数据迁移到新电脑怎么操作？'],
-  admin:  ['新员工入职第一周的行政事项清单','会议室设备（投屏/麦克风）使用教程','节假日值班如何申请调休？'],
-  testA:  ['测试数据如何导出为 Excel？','测试环境与生产环境的差异说明'],
-  testB:  ['流程审批被退回后如何重新提交？','如何批量撤回已发起的流程？'],
-  security:['EDR 与防火墙的联动配置方法','勒索病毒加密文件的恢复方案','等保测评中终端安全的要求项'],
+  it: [
+    {q:'如何批量重置部门内多名员工的 VPN？',src:'群聊',group:'IT服务-问题反馈群'},
+    {q:'VPN 登录后无法访问内网特定系统',src:'频道',group:'IT公告-发布频道'},
+    {q:'旧电脑数据迁移到新电脑怎么操作？',src:'群聊',group:'新员工-IT答疑群'},
+  ],
+  admin: [
+    {q:'新员工入职第一周的行政事项清单',src:'群聊',group:'行政服务-全体群'},
+    {q:'会议室设备（投屏/麦克风）使用教程',src:'频道',group:'行政通知-频道'},
+    {q:'节假日值班如何申请调休？',src:'群聊',group:'食堂/办公区-报修群'},
+  ],
+  testA: [
+    {q:'测试数据如何导出为 Excel？',src:'群聊',group:'测试业务-问答反馈群'},
+    {q:'测试环境与生产环境的差异说明',src:'群聊',group:'测试业务-数据答疑群'},
+  ],
+  testB: [
+    {q:'流程审批被退回后如何重新提交？',src:'群聊',group:'测试业务-流程审批群'},
+    {q:'如何批量撤回已发起的流程？',src:'群聊',group:'测试业务-流程问题群'},
+  ],
+  security: [
+    {q:'EDR 与防火墙的联动配置方法',src:'群聊',group:'终端安全-告警响应群'},
+    {q:'勒索病毒加密文件的恢复方案',src:'频道',group:'威胁情报-发布频道'},
+    {q:'等保测评中终端安全的要求项',src:'群聊',group:'安全基线-整改群'},
+  ],
 };
 // 知识回流-互联网答案：数字人未命中知识库 → 搜索互联网作答（回答末尾带「来自互联网」标识）→ 系统自动识别后进入回流队列，由管理员确认是否回流
 // 群里人工回答不再纳入（上下文无法准确对应到用户问题）；未命中且无互联网回答的问题走 MISS_QA 缺口
@@ -1044,21 +1130,6 @@ const REFLOWS = {
   ],
   testA: [], testB: [],
 };
-let reflowQueue = [];   // 手动加入的回流项（缺口=未命中且无互联网回答 / 历史问答=命中了但答得不理想）
-let ignoredReflows = new Set();   // 管理员忽略的互联网答案（原型内保持忽略状态）
-function addMissToReflow(q){
-  if(reflowQueue.some(r=>r.q===q)) { alert('该问题已在回流队列中'); return; }
-  reflowQueue.push({ q, a:'', type:'gap', src:'缺口', group:'未命中问题', t:'刚刚', who:'待补充答案' });
-  renderReflow();
-  const el = $('reflowList'); if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
-}
-/* 历史问答检索 → 加入回流：数字人答得不理想但命中了知识库，管理员修改答案后回流 */
-function addQAtoReflow(q){
-  if(reflowQueue.some(r=>r.q===q)) { alert('该问题已在回流队列中'); return; }
-  reflowQueue.push({ q, a:'', type:'gap', src:'历史问答', group:'历史问答检索', t:'刚刚', who:'待补充答案' });
-  renderReflow();
-  const el = $('reflowList'); if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
-}
 /* 后台组织管理：业务入口名称 / 功能模块 */
 const ENTRY_NAME = { it:'IT业务', admin:'行政业务', jingfen:'经分业务', security:'安全终端业务', test:'测试业务' };
 const MODS = { dash:'运营看板', qa:'问题记录&知识回流', groups:'群聊&频道运营', seaf:'Seaf 运营观测' };
@@ -1145,8 +1216,8 @@ function applyUser(){
 
 function openUserModal(){
   $('userList').innerHTML = Object.entries(USERS).map(([id,u])=>`
-    <button type="button" class="p-user-option" style="display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:10px;padding:10px 14px;cursor:pointer;background:var(--surface);${currentUser===id?'background:var(--blue-soft);border-color:var(--blue)':''}" onclick="selectUser('${id}')">
-      <div class="u-avatar" style="background:${currentUser===id?'var(--blue)':'var(--border-strong)'}">${u.avatar}</div>
+    <button type="button" class="p-user-option" style="display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:10px;padding:10px 14px;cursor:pointer;${currentUser===id?'--user-option-bg:color-mix(in srgb,var(--blue) 2%,transparent);border-color:var(--blue)':''}" onclick="selectUser('${id}')">
+      <div class="u-avatar" style="background:${currentUser===id?'var(--blue)':'color-mix(in srgb,var(--text) 12%,var(--surface-soft))'};color:${currentUser===id?'var(--primary-foreground)':'var(--text)'}">${u.avatar}</div>
       <div style="flex:1"><div style="font-weight:700;font-size:14px">${u.name}</div><div style="font-size:12px;color:var(--muted)">${u.dept} · ${u.role}</div></div>
       <div style="font-size:11px;color:var(--muted)">${u.bots.map(b=>BOTS[b].name).join(' / ')}</div>
       ${currentUser===id?'<span class="pill on">当前</span>':''}
@@ -1171,7 +1242,7 @@ const CRUMBS = {
   'bot-platform':'业务运营平台',
 };
 const BOT_ENTRY_CRUMBS = {
-  overview:'总览', it:'IT业务', admin:'行政业务', jingfen:'经分业务', security:'安全终端业务', test:'测试业务'
+  overview:'总览超管', it:'IT业务', admin:'行政业务', jingfen:'经分业务', security:'安全终端业务', test:'测试业务'
 };
 const LEGACY_PAGE_STATUS = {
   'legacy-overview':'数字人已上线',
@@ -1478,19 +1549,6 @@ function renderHot(){
 }
 
 /* ══════════════ 子页：问题记录 & 知识回流 ══════════════ */
-function renderQA(){
-  const b = BOTS[activeBot];
-  const recs = QA_RECORDS[activeBot] || [];
-  const kw = ($('qaSearch')?.value||'').trim().toLowerCase();
-  const st = $('qaStatus')?.value||'';
-  const list = recs.filter(r=>(!kw||r.q.toLowerCase().includes(kw)||r.u.includes(kw)) && (!st||r.hit===st));
-  $('qaTable').innerHTML = list.length? list.map(r=>{
-    const queued = reflowQueue.some(x=>x.q===r.q);
-    const esc = r.q.replace(/'/g,"\\'");
-    return `<tr><td class="mono">${r.t}</td><td>${r.u}</td><td>${r.q}</td><td><span class="tag ${r.hit==='已命中'?'green':'warn'}">${r.hit}</span></td><td style="white-space:nowrap"><button class="btn sm" onclick="drillQADetail('${esc}')">查看</button> ${queued?'<span class="tag">已在回流队列</span>':`<button class="btn sm primary" onclick="addQAtoReflow('${esc}')">加入回流</button>`}</td></tr>`;
-  }).join('') : `<tr><td colspan="5" style="color:var(--faint);text-align:center">无匹配记录</td></tr>`;
-  $('qaCount').innerHTML = `${b.name} · 共 ${list.length} 条问答记录 ${tip('命中 = 回答引用知识库内容；未命中 = 知识库未覆盖。点击「加入回流」可把任意记录（含命中但答得不理想）加入知识回流队列，修改后回流')}`;
-}
 function drillQADetail(q){
   $('qaModalBody').innerHTML = (QA_RECORDS[activeBot]||[]).filter(r=>r.q===q||!q).map(r=>`<tr><td class="mono">${r.t}</td><td>${r.u}</td><td>${r.q}</td><td><span class="masked">回答内容（原型脱敏）</span></td><td><span class="tag ${r.hit==='已命中'?'green':'warn'}">${r.hit}</span></td></tr>`).join('');
   openModal('qaModal');
@@ -1542,11 +1600,11 @@ function renderKb(){
           <div class="b-name" style="font-size:14px">${l.name}</div>
           <div class="b-sub" style="font-size:11px;color:var(--faint)">${l.type==='faq'?'FAQ 类型':'文档类型'} · ${l.updated}</div>
         </div>
+        <span class="tag green kb-joined-status">已加入</span>
       </div>
       <div class="b-row"><span>${l.type==='faq'?'问答条目':'文档数'}</span><b>${fmt(l.type==='faq' ? (l.items?.length||0) : l.docs)}</b></div>
       <div class="b-row"><span>容量</span><b>${l.size}</b></div>
       <div class="b-row"><span>命中率</span><b class="${l.hit>=0.85?'ok':''}" style="${l.hit<0.85?'color:var(--amber)':''}">${pct(l.hit)}</b></div>
-      <div style="margin-top:8px"><span class="tag green">已加入</span></div>
     </div>`).join('');
   // 「＋ 添加知识库」卡片（点击从有权限的库中选择加入）
   const addCard = `
@@ -1556,15 +1614,6 @@ function renderKb(){
       <span style="font-size:11px;color:var(--faint);text-align:center">从你有权限的库中选择<br>加入运营工作台</span>
     </div>`;
   $('kbLibCards').innerHTML = cards + addCard;
-  // ③ 未命中问题（知识库缺口 → 点击加入回流队列）
-  const miss = MISS_QA[activeBot] || [];
-  $('missQa').innerHTML = miss.length ? miss.map((q,i)=>`
-    <div class="bot-card" style="padding:8px 12px;display:flex;align-items:center;gap:10px;cursor:pointer" onclick="addMissToReflow('${q.replace(/'/g,"\\'")}')" title="点击加入回流队列">
-      <span class="tag warn">缺口</span>
-      <span style="flex:1;font-size:13px">${q}</span>
-      <span class="mono" style="font-size:11px;color:var(--faint)">${(86-i*12)} 次/周</span>
-      <button class="btn sm primary" style="pointer-events:none">加入回流</button>
-    </div>`).join('') : '<div class="hint-text" style="padding:8px">暂无未命中问题，知识库覆盖良好 🎉</div>';
   renderReflow();
 }
 /* 添加知识库：从有权限的库池中选择（已加入的置灰不可选） */
@@ -1575,9 +1624,9 @@ function openLibPicker(){
   $('libPickerList').innerHTML = pool.map(p=>{
     const joined = joinedNames.has(p.name);
     return `
-      <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--surface-soft);${joined?'opacity:.55':''}">
-        <div class="bot-ico" style="width:32px;height:32px;font-size:13px;background:${p.type==='faq'?'#c77d0a':'#1f5fe8'}">${p.type==='faq'?'FAQ':'📄'}</div>
-        <div style="flex:1">
+      <div class="module-picker-item${joined?' is-joined':''}">
+        <div class="bot-ico" style="width:32px;height:32px;font-size:13px">${p.type==='faq'?'FAQ':'📄'}</div>
+        <div class="module-picker-content">
           <b style="font-size:13px">${p.name}</b>
           <div style="font-size:11px;color:var(--faint)">${p.type==='faq'?'问答条目':'文档'} ${fmt(p.docs)} · ${p.size} · 命中率 ${pct(p.hit)}</div>
         </div>
@@ -1597,168 +1646,12 @@ function confirmAddLib(name, btn){
     name:p.name, type:p.type, docs:p.docs, size:p.size, hit:p.hit, updated:'刚刚', status:'已接入',
     files:[], items:p.type==='faq'?[]:undefined,
   });
-  btn.closest('div[style*="display:flex"]').querySelector('.btn')?.remove();
+  const item = btn.closest('.module-picker-item');
+  item.querySelector('.btn')?.remove();
   const tag = document.createElement('span'); tag.className='tag green'; tag.textContent='已加入';
-  btn.closest('div[style*="display:flex"]').appendChild(tag);
+  item.appendChild(tag);
+  item.classList.add('is-joined');
   renderKb();
-}
-/* ══════════════ 知识回流：互联网答案（自动识别） + 缺口（手动加入） → 确认 → 回流知识库 ══════════════ */
-let reflowLibIdx = 0;   // 记住选中的目标知识库（renderReflow 重建 select 后恢复）
-function renderReflow(){
-  const libs = BOT_LIBS[activeBot] || [];
-  // 目标知识库下拉
-  const sel = $('reflowLibSel');
-  const prev = parseInt(sel?.value||'0');
-  if(prev>=0 && prev<libs.length) reflowLibIdx = prev;
-  sel.innerHTML = libs.map((l,i)=>`<option value="${i}">${l.name}${l.type==='faq'?'（FAQ）':''}</option>`).join('') || '<option>暂未对接知识库</option>';
-  sel.value = String(Math.min(reflowLibIdx, Math.max(0, libs.length-1)));
-  sel.onchange = ()=>{ reflowLibIdx = parseInt(sel.value||'0'); renderReflow(); };
-  const lib = libs[reflowLibIdx];
-  $('reflowHint').setAttribute('data-tip', lib ? (lib.type==='faq' ? '选择目标知识库：目标 FAQ 型 → 回流后直接新增为问答条目' : '选择目标知识库：目标文档型 → 回流后聚合进 FAQ 文档上传') : '暂未对接知识库，请先添加知识库');
-  // 问题来源筛选（固定选项：全部来源 / 群聊 / 频道；缺口类条目始终显示，不受来源过滤）
-  const srcSel = $('reflowSrcSel');
-  srcSel.onchange = ()=>renderReflow();
-  const srcF = srcSel?.value||'';
-  // 回流队列 = 互联网答案（数字人自动识别，按来源过滤）+ 缺口/历史问答（手动加入，始终显示）
-  const net = (REFLOWS[activeBot]||[]).filter(r=>!ignoredReflows.has(r.q)).filter(r=>!srcF||r.src===srcF);
-  const gaps = reflowQueue.filter(r=>r.type==='gap');
-  const all = [...net, ...gaps];
-  $('reflowList').innerHTML = all.length ? all.map((r,i)=>{
-    const isGap = r.type==='gap';
-    const ansRow = isGap
-      ? `<div style="margin-top:6px;display:flex;gap:8px;align-items:center">
-          <span style="font-size:12px;color:var(--amber);font-weight:600">待补答案：</span>
-          <input id="reflowAns${i}" type="text" placeholder="填写答案内容…" style="flex:1;font-size:13px">
-        </div>`
-      : `<div style="margin-top:6px;font-size:12px;color:var(--muted);padding-left:12px;border-left:2px solid var(--blue)" data-reflow-ans="1">🌐 来自互联网的答案：${r.a}</div>`;
-    return `
-      <div style="border:1px solid var(--border);border-radius:10px;padding:10px 14px;background:var(--surface-soft)" data-gap="${isGap?'1':'0'}">
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-          <input type="checkbox" class="rc-chk" data-i="${i}" onchange="updateReflowSel()" style="flex:none">
-          <span class="tag ${isGap?'warn':'blue'}">${isGap?'缺口':('来自互联网 · '+r.src)}</span>
-          <b style="font-size:13px">${r.q}</b>
-          <span style="margin-left:auto;font-size:11px;color:var(--faint)">${r.group} · ${r.t} · ${r.who}</span>
-          <button class="btn primary sm" onclick="confirmReflow(this, ${i}, ${isGap})">回流</button>
-          ${isGap?'':`<button class="btn sm" onclick="editReflowAnswer(this)">✏️ 编辑</button>`}
-          <button class="btn sm" onclick="removeReflowItem(this, '${r.q.replace(/'/g,"\\'")}', ${isGap})">忽略</button>
-        </div>
-        ${ansRow}
-      </div>`;
-  }).join('') : '<div class="hint-text" style="padding:8px">暂无待回流内容 🎉</div>';
-  updateReflowSel();
-}
-/* 忽略回流项：缺口/历史问答从队列移除；互联网答案记录忽略状态（切数字人后不再出现） */
-function removeReflowItem(btn, q, isGap){
-  if(isGap){
-    const qi = reflowQueue.findIndex(x=>x.q===q);
-    if(qi>=0) reflowQueue.splice(qi,1);
-  } else {
-    ignoredReflows.add(q);
-  }
-  const card = btn.closest('div[data-gap]');
-  if(card) card.remove();
-  updateReflowSel();
-}
-/* 编辑互联网答案：答案区切换为可编辑 textarea，保存后恢复展示（管理员可修改后回流） */
-function editReflowAnswer(btn){
-  const card = btn.closest('[data-gap]');
-  const ansBox = card.querySelector('[data-reflow-ans]');
-  if(!ansBox) return;
-  const cur = ansBox.textContent.replace('🌐 来自互联网的答案：','').trim();
-  const wrap = document.createElement('div');
-  wrap.style.cssText = 'margin-top:6px;display:flex;gap:8px;align-items:flex-start';
-  wrap.setAttribute('data-reflow-edit','1');
-  wrap.innerHTML = `<span style="font-size:12px;color:var(--blue);font-weight:600;flex:none;padding-top:6px">编辑答案：</span>
-    <textarea style="flex:1;font-size:13px;min-height:64px;resize:vertical;font-family:inherit" placeholder="修改答案内容…">${cur.replace(/&/g,'&amp;').replace(/</g,'&lt;')}</textarea>`;
-  ansBox.replaceWith(wrap);
-  btn.textContent = '保存';
-  btn.classList.add('primary');
-  btn.onclick = ()=>saveReflowAnswer(btn);
-  const ta = wrap.querySelector('textarea');
-  if(ta){ ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); }
-}
-function saveReflowAnswer(btn){
-  const card = btn.closest('[data-gap]');
-  const ta = card.querySelector('textarea');
-  const v = ta ? ta.value.trim() : '';
-  if(!v){ alert('答案不能为空'); return; }
-  const wrap = ta.closest('[data-reflow-edit]');
-  const box = document.createElement('div');
-  box.style.cssText = 'margin-top:6px;font-size:12px;color:var(--muted);padding-left:12px;border-left:2px solid var(--blue)';
-  box.setAttribute('data-reflow-ans','1');
-  box.textContent = '🌐 来自互联网的答案：' + v;
-  wrap.replaceWith(box);
-  btn.textContent = '✏️ 编辑';
-  btn.classList.remove('primary');
-  btn.onclick = ()=>editReflowAnswer(btn);
-}
-function updateReflowSel(){
-  const n = document.querySelectorAll('#reflowList .rc-chk:checked').length;
-  const c = $('reflowSelCount'); if(c) c.textContent = n;
-  const all = $('reflowSelAll');
-  if(all){
-    const total = document.querySelectorAll('#reflowList .rc-chk').length;
-    all.checked = total>0 && n===total;
-    all.indeterminate = n>0 && n<total;
-  }
-}
-function toggleReflowAll(el){
-  document.querySelectorAll('#reflowList .rc-chk').forEach(c=>c.checked = el.checked);
-  updateReflowSel();
-}
-/* 单条回流 */
-function confirmReflow(btn, i, isGap){
-  const card = btn.closest('[data-gap]');
-  const res = doReflow(card, i, isGap);
-  if(!res.ok){ alert(res.msg); return; }
-  card.innerHTML = `<div style="color:var(--green);font-size:13px;font-weight:600">✓ 已回流到「${res.lib.name}」${res.lib.type==='faq'?'（新增问答条目）':'（聚合进 FAQ 文档）'} · ${res.q}</div>`;
-  renderKb();
-}
-/* 批量回流：勾选多条一键回流 */
-function batchReflow(){
-  const cards = [...document.querySelectorAll('#reflowList .rc-chk:checked')].map(c=>c.closest('[data-gap]'));
-  if(!cards.length){ alert('请先勾选要回流的记录（可点「全选」）'); return; }
-  let ok = 0, skip = [];
-  cards.forEach(card=>{
-    const i = parseInt(card.querySelector('.rc-chk').dataset.i);
-    const isGap = card.dataset.gap==='1';
-    const res = doReflow(card, i, isGap);
-    if(res.ok){
-      card.innerHTML = `<div style="color:var(--green);font-size:13px;font-weight:600">✓ 已回流到「${res.lib.name}」${res.lib.type==='faq'?'（新增问答条目）':'（聚合进 FAQ 文档）'} · ${res.q}</div>`;
-      ok++;
-    } else skip.push(res.msg);
-  });
-  if(skip.length) alert(`有 ${skip.length} 条未回流：${skip[0]}`);
-  if(ok) renderKb();
-}
-/* 回流核心：读取记录 → 写入目标知识库 → 从队列移除 */
-function doReflow(card, i, isGap){
-  const libs = BOT_LIBS[activeBot] || [];
-  const lib = libs[reflowLibIdx];
-  const q = card.querySelector('b').textContent;
-  let a;
-  if(isGap){
-    const inp = document.getElementById(`reflowAns${i}`);
-    a = inp ? inp.value.trim() : '';
-    if(!a) return { ok:false, msg:'「'+q.slice(0,18)+'…」请先填写答案内容' };
-    const qi = reflowQueue.findIndex(x=>x.q===q);
-    if(qi>=0) reflowQueue.splice(qi,1);
-  } else {
-    // 优先读编辑中的 textarea；否则读答案展示块
-    const ta = card.querySelector('textarea');
-    a = ta ? ta.value.trim() : card.querySelector('[data-reflow-ans]').textContent.replace('🌐 来自互联网的答案：','').trim();
-  }
-  if(lib){
-    if(lib.type==='faq'){
-      lib.items = lib.items||[];
-      lib.items.unshift({ q, a, src:'人工回流·'+(isGap?'缺口':'互联网'), st:'已上线' });
-    } else {
-      const faq = lib.files.find(f=>f.n.includes('高频问题FAQ'));
-      if(faq){ faq.t='刚刚'; faq.st='解析中'; }
-      else { lib.docs += 1; lib.files.unshift({ n:'高频问题FAQ.docx', s:'0.3MB', t:'刚刚', st:'解析中' }); }
-    }
-  }
-  return { ok:true, lib, q };
 }
 function openAIExtract(){
   // 知识库下拉（当前数字人的知识库）
@@ -1923,11 +1816,11 @@ function renderGroups(){
           <div class="b-name" style="font-size:14px">${g.n}</div>
           <div class="b-sub" style="font-size:11px;color:var(--faint)">${g.ch?'推推频道':'推推群'} · ${g.m} 成员</div>
         </div>
+        <span class="tag green grp-monitored-status">已监控</span>
       </div>
       <div class="b-row"><span>成员数</span><b>${fmt(g.m)}</b></div>
       <div class="b-row"><span>${scope}消息</span><b>${fmt(Math.round(g.msg*scale))}</b></div>
       <div class="b-row"><span>活跃度</span><b>${g.act}</b></div>
-      <div style="margin-top:8px"><span class="tag green">已监控</span></div>
     </div>`).join('');
   const addCard = `
     <div class="bot-card grp-add-card" style="border-style:dashed;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:150px;cursor:pointer" onclick="openGroupPicker()">
@@ -1990,9 +1883,9 @@ function openGroupPicker(){
   $('grpPickerList').innerHTML = pool.map(g=>{
     const has = joined.has(g.n);
     return `
-      <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--surface-soft);${has?'opacity:.55':''}">
-        <div class="bot-ico" style="width:32px;height:32px;font-size:13px;background:${g.ch?'#7c3aed':'#0e8f58'}">${g.ch?'频':'群'}</div>
-        <div style="flex:1">
+      <div class="module-picker-item${has?' is-joined':''}">
+        <div class="bot-ico grp-type-ico ${g.ch?'channel':'group'}" style="width:32px;height:32px;font-size:13px">${g.ch?'频':'群'}</div>
+        <div class="module-picker-content">
           <b style="font-size:13px">${g.n}</b>
           <div style="font-size:11px;color:var(--faint)">${g.ch?'推推频道':'推推群'} · ${fmt(g.m)} 成员 · ${fmt(g.msg)} 条消息</div>
         </div>
@@ -2007,9 +1900,11 @@ function confirmAddGroup(name, btn){
   if(!g) return;
   GROUPS[activeBot] = GROUPS[activeBot] || [];
   GROUPS[activeBot].push({ n:g.n, m:g.m, msg:g.msg, act:'中', ch:g.ch });
-  btn.closest('div[style*="display:flex"]').querySelector('.btn')?.remove();
+  const item = btn.closest('.module-picker-item');
+  item.querySelector('.btn')?.remove();
   const tag = document.createElement('span'); tag.className='tag green'; tag.textContent='已监控';
-  btn.closest('div[style*="display:flex"]').appendChild(tag);
+  item.appendChild(tag);
+  item.classList.add('is-joined');
   renderGroups();
 }
 /* ══════════════ 运营报告（周报/月报，可选择具体周期，限回溯期限） ══════════════ */
@@ -2084,19 +1979,49 @@ function genReport(){
       <p style="margin-bottom:6px;font-weight:700">四、运营建议</p>
       <p style="padding-left:12px">· 将「打印机驱动」类工单纳入知识库回流，可再提升主动解决率约 2pct；未命中问题优先补录（见知识回流）。</p>
     </div>
-    <div style="display:flex;gap:10px;margin-top:14px">
+    <div class="hint-text" style="margin-top:14px">铁律：AI 只起草，结论与拍板归业务</div>`;
+  $('reportActions').innerHTML = `
       <button class="btn primary" onclick="confirmReport(this)">确认并落库</button>
       <button class="btn">改草稿</button>
-      <button class="btn ghost">另存为模板</button>
-      <span class="hint-text" style="margin-left:auto">铁律：AI 只起草，结论与拍板归业务</span>
-    </div>`;
+      <button class="btn ghost">另存为模板</button>`;
 }
 function confirmReport(btn){
   btn.textContent='✓ 已落库'; btn.disabled=true;
 }
 
 /* ══════════════ 组织管理（后台，超管） ══════════════ */
-function renderConfig(){
+let cfgPage = 1;
+let cfgPageSize = 10;
+let cfgPageCount = 1;
+function changeConfigPageSize(value){
+  $('cfgCustomPageSize').hidden = value !== 'custom';
+  if(value === 'custom'){
+    $('cfgCustomPageSize').value = cfgPageSize;
+    $('cfgCustomPageSize').focus();
+    $('cfgCustomPageSize').select();
+  } else setConfigPageSize(value);
+}
+function setConfigPageSize(value){
+  const size = Number(value);
+  if(!Number.isSafeInteger(size) || size < 1){
+    $('cfgCustomPageSize').value = cfgPageSize;
+    return;
+  }
+  cfgPageSize = size;
+  $('cfgCustomPageSize').value = size;
+  renderConfig(true);
+}
+function goConfigPage(value){
+  const page = Number(value);
+  if(!Number.isSafeInteger(page)){
+    $('cfgPageNumber').value = cfgPage;
+    return;
+  }
+  cfgPage = Math.max(1, Math.min(cfgPageCount, page));
+  renderConfig();
+}
+function renderConfig(resetPage = false){
+  if(resetPage) cfgPage = 1;
   // ① 数字人接入管理：通用配置（所属业务 / 同步频率；数据源自动拉取，开放范围=所属业务）
   const kw = ($('botConfigSearch')?.value||'').trim().toLowerCase();
   const sf = $('botConfigStatus')?.value||'';
@@ -2104,29 +2029,86 @@ function renderConfig(){
     const entry = BOT_ENTRY[b.id];
     return (!kw || b.name.toLowerCase().includes(kw) || (ENTRY_NAME[entry]||'').toLowerCase().includes(kw)) && (!sf || b.status===sf);
   });
-  $('cfgBotTable').innerHTML = bots.map(b=>{
+  cfgPageCount = Math.max(1, Math.ceil(bots.length / cfgPageSize));
+  cfgPage = Math.min(cfgPage, cfgPageCount);
+  const start = (cfgPage - 1) * cfgPageSize;
+  const pageRows = bots.slice(start, start + cfgPageSize);
+  $('cfgPageSummary').textContent = `共 ${bots.length} 条 · ${bots.length ? start + 1 : 0}–${start + pageRows.length} 条`;
+  $('cfgPageNumber').value = cfgPage;
+  $('cfgPageTotal').textContent = `/ ${cfgPageCount} 页`;
+  $('cfgPrevPage').disabled = cfgPage === 1;
+  $('cfgNextPage').disabled = cfgPage === cfgPageCount;
+  $('cfgBotTable').innerHTML = pageRows.map(b=>{
     const entry = BOT_ENTRY[b.id];
     return `<tr><td><b>${b.name}</b></td>
       <td><span class="tag blue">${ENTRY_NAME[entry]||'—'}</span></td>
       <td><span class="tag ${b.msg?'green':''}">${b.status}</span></td>
       <td>${b.msg?'每 5 分钟':'—'}</td>
       <td style="white-space:nowrap"><button class="btn sm" onclick="alert('原型示意：编辑数字人配置（名称 / 所属业务 / 同步频率）')">编辑</button></td></tr>`;
-  }).join('');
+  }).join('') || '<tr><td colspan="5" class="hint-text">无匹配数字人</td></tr>';
 }
 /* ── 组织管理：架构同步 + 4 档角色 + 业务运营平台三级权限（融入） ── */
 let orgSelRows = new Set();
+let orgPage = 1;
+let orgPageSize = 10;
+let orgPageCount = 1;
+function changeOrgPageSize(value){
+  $('orgCustomPageSize').hidden = value !== 'custom';
+  if(value === 'custom'){
+    $('orgCustomPageSize').value = orgPageSize;
+    $('orgCustomPageSize').focus();
+    $('orgCustomPageSize').select();
+  } else setOrgPageSize(value);
+}
+function setOrgPageSize(value){
+  const size = Number(value);
+  if(!Number.isSafeInteger(size) || size < 1){
+    $('orgCustomPageSize').value = orgPageSize;
+    return;
+  }
+  orgPageSize = size;
+  $('orgCustomPageSize').value = size;
+  renderOrg(true);
+}
+function goOrgPage(value){
+  const page = Number(value);
+  if(!Number.isSafeInteger(page)){
+    $('orgPageNumber').value = orgPage;
+    return;
+  }
+  orgPage = Math.max(1, Math.min(orgPageCount, page));
+  orgSelRows.clear();
+  renderOrg();
+}
 function renderOrgDepts(){
   const depts = [...new Set(ORG_USERS.map(u=>u.dept))];
   $('orgDeptFilter').innerHTML = '<option value="">全部部门</option>' + depts.map(d=>`<option>${d}</option>`).join('');
 }
-function renderOrg(){
+function renderOrg(resetPage = false){
+  if(resetPage){
+    orgPage = 1;
+    orgSelRows.clear();
+  }
   const kw = ($('orgSearch')?.value||'').trim().toLowerCase();
   const df = $('orgDeptFilter')?.value||'';
   const rf = $('orgRoleFilter')?.value||'';
   const list = ORG_USERS.filter(u=>
     (!kw || u.u.toLowerCase().includes(kw) || (u.acct||'').toLowerCase().includes(kw) || u.dept.toLowerCase().includes(kw)) &&
     (!df || u.dept===df) && (!rf || u.role===rf));
-  $('orgTable').innerHTML = list.map(p=>{
+  orgPageCount = Math.max(1, Math.ceil(list.length / orgPageSize));
+  orgPage = Math.min(orgPage, orgPageCount);
+  const start = (orgPage - 1) * orgPageSize;
+  const pageRows = list.slice(start, start + orgPageSize);
+  orgSelRows = new Set(pageRows.filter(p=>orgSelRows.has(p.u)).map(p=>p.u));
+  $('orgPageSummary').textContent = `共 ${list.length} 条 · ${list.length ? start + 1 : 0}–${start + pageRows.length} 条`;
+  $('orgPageNumber').value = orgPage;
+  $('orgPageTotal').textContent = `/ ${orgPageCount} 页`;
+  $('orgPrevPage').disabled = orgPage === 1;
+  $('orgNextPage').disabled = orgPage === orgPageCount;
+  $('orgSelAll').disabled = !pageRows.length;
+  $('orgSelAll').checked = pageRows.length > 0 && orgSelRows.size === pageRows.length;
+  $('orgSelAll').indeterminate = orgSelRows.size > 0 && orgSelRows.size < pageRows.length;
+  $('orgTable').innerHTML = pageRows.map(p=>{
     const permCell = p.role==='super_admin'
       ? '<span class="pill on">全部业务 / 全部数字人 / 全部功能</span>'
       : Object.entries(p.grants||{}).map(([entry,bots])=>
@@ -2162,11 +2144,17 @@ function openGrantBatchModal(){
   $('orgBatchRole').value = 'admin';
   openModal('grantBatchModal');
 }
-function toggleOrgRow(u, cb){ if(cb.checked) orgSelRows.add(u); else orgSelRows.delete(u); }
+function toggleOrgRow(u, cb){
+  if(cb.checked) orgSelRows.add(u); else orgSelRows.delete(u);
+  const count = document.querySelectorAll('#orgTable .org-chk').length;
+  $('orgSelAll').checked = count > 0 && orgSelRows.size === count;
+  $('orgSelAll').indeterminate = orgSelRows.size > 0 && orgSelRows.size < count;
+}
 function toggleOrgAll(cb){
   const boxes = [...document.querySelectorAll('#orgTable .org-chk')];
   boxes.forEach(c=>c.checked = cb.checked);
   orgSelRows = new Set(cb.checked ? boxes.map(c=>c.dataset.u) : []);
+  cb.indeterminate = false;
 }
 function grantBatch(){
   const role = $('orgBatchRole').value;
@@ -2293,7 +2281,8 @@ document.querySelectorAll('.inner-tab').forEach(el=>el.addEventListener('click',
 ['dashDim','dashRange'].forEach(id=>$(id).addEventListener('change', ()=>{ renderDashKpis(); renderDashCharts(); renderHot(); }));
 ['grpDim','grpRange'].forEach(id=>$(id).addEventListener('change', updateGroupRange));
 ['qaDim','qaRange'].forEach(id=>$(id).addEventListener('change', updateQaRange));
-['qaSearch','qaStatus'].forEach(id=>$(id).addEventListener('change', renderQA));
+$('qaSearch').addEventListener('input', renderQA);
+$('qaStatus').addEventListener('change', renderQA);
 window.addEventListener('keydown', e=>{ if(e.key==='Escape') document.querySelectorAll('.modal-mask.show').forEach(m=>m.classList.remove('show')); });
 window.addEventListener('resize', resizeCharts);
 // 容器尺寸真实变化（窗口缩放 / 网格重排）时自动重算所有图表尺寸
@@ -2319,7 +2308,7 @@ const scrollTargets = new Set([
   document.body,
   document.documentElement,
   document.scrollingElement,
-  ...document.querySelectorAll('.col-main, .main-shell, .nav-panel, .modal, .m-body, .inner-tabs, .bot-tabs, .org-table-scroll')
+  ...document.querySelectorAll('.col-main, .main-shell, .nav-panel, .modal, .m-body, .inner-tabs, .bot-tabs, .ui-table-scroll, #itab-bot-qa .rf-column')
 ].filter(Boolean));
 scrollTargets.forEach(target=>{
   let scrollTimer;
@@ -2332,7 +2321,7 @@ scrollTargets.forEach(target=>{
 </script>
 <script src="./lucide.min.js"></script>
 <script src="./workbench-icons.js"></script>
-<script src="./workbench-ui.js?v=20260916-permission-wrap-2"></script>
+<script src="./workbench-ui.js?v=20260917-card-label-tooltip"></script>
 <script src="./personalization-ui.js?v=20260914-font-select-1"></script>
 <script>
 (() => {

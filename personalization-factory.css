@@ -33,7 +33,7 @@
 #ops-personalization [data-preview-theme="ollama"] { --preview-bg: #f9f9f7; --preview-card: #fff; --preview-rail: #111; --preview-accent: #111; --preview-border: #dededa; }
 #ops-personalization [data-preview-theme="opencode"] { --preview-bg: #f8f6f1; --preview-card: #fffef9; --preview-rail: #2d2c28; --preview-accent: #2d2c28; --preview-border: #ddd9ce; }
 #ops-personalization [data-preview-theme="brutalist"] { --preview-bg: #FFFDF5; --preview-card: #FFFFFF; --preview-rail: #000000; --preview-accent: #FFD93D; --preview-border: #000000; }
-#ops-personalization [data-preview-theme="brutalist"] .theme-preview__content b { border-width: 3px; border-radius: 0; box-shadow: 4px 4px 0 #000; }
+#ops-personalization [data-preview-theme="brutalist"] .theme-preview__content b { border-width: var(--brutal-border-width, 3px); border-radius: 0; box-shadow: 4px 4px 0 #000; }
 #ops-personalization [data-preview-theme="runway"] { --preview-bg: #0b0b0b; --preview-card: #121212; --preview-rail: #050505; --preview-accent: #f4f4f4; --preview-border: #2b2b2b; }
 #ops-personalization [data-preview-theme="together"] { --preview-bg: #fbfaf8; --preview-card: #fff; --preview-rail: #1c1917; --preview-accent: #ef5b2a; --preview-border: #e2ddd7; }
 #ops-personalization [data-preview-theme="voltagent"] { --preview-bg: #090014; --preview-card: #1a103c; --preview-rail: #100624; --preview-accent: #ff00ff; --preview-border: #00ffff; }
@@ -80,7 +80,7 @@ html[data-p-theme="neumorphism"] #ops-personalization .personalization-settings-
 #ops-personalization .theme-choice { border-color: var(--surface-card-border, var(--border)); background: var(--surface-card-bg, var(--surface)); color: var(--surface-card-foreground, var(--text)); box-shadow: var(--surface-card-shadow, none); }
 #ops-personalization .theme-choice:hover { border-color: color-mix(in srgb, var(--blue) 55%, var(--border)); box-shadow: var(--surface-card-hover-shadow, none); transform: var(--surface-card-hover-transform, translateY(-1px)); }
 #ops-personalization .theme-choice[aria-checked="true"] { border-color: var(--blue); box-shadow: var(--surface-card-hover-shadow, 0 0 0 1px var(--blue)); }
-#ops-personalization .theme-choice[data-theme="brutalist"] { border: 3px solid #000; border-radius: 0; box-shadow: 4px 4px 0 #000; }
+#ops-personalization .theme-choice[data-theme="brutalist"] { border: var(--brutal-border-width, 3px) solid #000; border-radius: 0; box-shadow: 4px 4px 0 #000; }
 #ops-personalization .theme-choice[data-theme="brutalist"]:hover { border-color: #000; box-shadow: 6px 6px 0 #000; transform: translate(-2px, -2px); }
 #ops-personalization .theme-choice[data-theme="brutalist"][aria-checked="true"] { border-color: #000; box-shadow: 6px 6px 0 #000; }
 #ops-personalization .theme-choice[data-theme="brutalist"] .theme-choice__check { background: #FFD93D; color: #000; }
@@ -99,7 +99,7 @@ html[data-p-theme="neumorphism"] #ops-personalization .personalization-settings-
 
 #ops-personalization { width:min(960px,calc(100vw - 48px)); height:auto; max-height:min(820px,calc(100dvh - 48px)); overflow:hidden; }
 #ops-personalization::backdrop { background:#0f172a57; backdrop-filter:blur(4px); }
-#ops-personalization .p-dialog-head { height:56px; min-height:56px; padding:8px 24px; }
+#ops-personalization .p-dialog-head { height:var(--ui-modal-header-height); min-height:var(--ui-modal-header-height); padding:0 24px; }
 #ops-personalization .p-dialog-head h2 { font-size:18px; line-height:28px; font-weight:600; }
 #ops-personalization .p-dialog-body { display:grid; gap:28px; padding:24px; }
 #ops-personalization .p-module { display:grid; gap:12px; padding:0; border:0; }

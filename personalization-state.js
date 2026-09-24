@@ -11,8 +11,8 @@
       light: palette('#fafafa','#ffffff','#f2f2f2','#171717','#666666','#171717','#ffffff','#e5e5e5','6px','8px','0 1px 2px rgba(0,0,0,.04)'),
       dark: palette('#151515','#1c1c1c','#262626','#ededed','#a3a3a3','#f5f5f5','#171717','#343434','6px','8px','0 2px 12px rgba(0,0,0,.22)') },
     brutalist: { label: 'Neo-brutalism', hint: '直角 · 硬边投影',
-      light: palette('#FFFDF5','#FFFFFF','#FFF8D6','#000000','#3D3D3D','#FFD93D','#000000','#000000','0px','0px','4px 4px 0 #000000','neo'),
-      dark: palette('#111111','#1D1D1D','#2A2A2A','#FFFFFF','#D6D6D6','#FFD93D','#000000','#FFFFFF','0px','0px','4px 4px 0 #000000','neo') },
+      light: palette('#FFF8D6','#FFFFFF','#FFF8D6','#000000','#3D3D3D','#FFD93D','#000000','#000000','0px','0px','4px 4px 0 #000000','neo'),
+      dark: palette('#111111','#1D1D1D','#2A2A2A','#FFFFFF','#D6D6D6','#FFD93D','#000000','#FFFFFF','0px','0px','4px 4px 0 #FFFFFF','neo') },
     claude: { label: 'Claude', hint: '暖色 · 阅读友好',
       light: palette('#f7f5f2','#fffdf9','#eee9e2','#2d2926','#716a63','#c96442','#fffaf5','#ded7ce','10px','12px','0 2px 8px rgba(69,52,42,.06)','serif'),
       dark: palette('#1f1b18','#28231f','#342e29','#ededed','#a3a3a3','#c96442','#fffaf5','#443b34','10px','12px','0 2px 12px rgba(0,0,0,.22)','serif') },
@@ -28,7 +28,7 @@
   };
   const defaults = Object.freeze({ version: 1, theme: 'default', mode: 'light', position: 'left', style: 'embedded', nav: 'wide', font: 'theme' });
   const choices = { theme: Object.keys(themes), mode: ['light','dark','system'], position: ['left','top'], style: ['standard','embedded','floating'], nav: ['wide','icons','labels'], font: ['theme','sans','serif','mono'] };
-  const key = 'ai-ops:public-demo:personalization:v1';
+  const key = 'ai-ops:public-demo:personalization:v2';
   const media = matchMedia('(prefers-color-scheme: dark)');
   const fonts = { sans: '-apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif', serif: 'Georgia, "Songti SC", "STSong", serif', mono: '"SFMono-Regular", Consolas, "PingFang SC", monospace', neo: '"Space Grotesk", -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif' };
   function normalize(input) {

@@ -1,0 +1,93 @@
+/* Shared geometry for controls, not navigation, cards, tags or multiline fields. */
+:root {
+  --ui-control-height:32px;
+  --ui-control-padding-inline:12px;
+  --ui-control-font-size:14px;
+  --ui-field-label-gap:8px;
+  --ui-field-gap:16px;
+  --ui-textarea-padding-block:5px;
+  --ui-control-theme-stroke-width:1px;
+  --ui-primary-stroke-width:0px;
+}
+html[data-p-theme="brutalist"] {
+  --ui-control-theme-stroke-width:var(--brutal-border-width);
+  --ui-primary-stroke-width:var(--brutal-border-width);
+}
+html[data-p-theme="neumorphism"] {
+  --ui-control-theme-stroke-width:0px;
+}
+
+/* Important geometry overrides legacy inline sizes and theme/mobile minimums. */
+:root :is(
+  button:not(.nav-item,.bot-tab,.inner-tab,.theme-choice,.theme-mode-choice,.p-theme,.p-mode,.p-user-option),
+  .btn:not(.p-user-option),
+  input:not([type]),
+  input[type="text"],input[type="search"],input[type="email"],input[type="url"],
+  input[type="tel"],input[type="password"],input[type="number"],
+  input[type="date"],input[type="time"],input[type="datetime-local"],input[type="month"],input[type="week"],
+  input[type="button"],input[type="submit"],input[type="reset"],
+  select:not(.ui-select-native,[multiple],[size]),
+  .p-choice > span,.user-message
+) {
+  box-sizing:border-box!important;
+  height:var(--ui-control-height)!important;
+  min-height:var(--ui-control-height)!important;
+  max-height:var(--ui-control-height)!important;
+  padding-block:0!important;
+  line-height:20px!important;
+  white-space:nowrap;
+  border-width:0!important;
+  outline:var(--ui-control-stroke-width,var(--ui-control-theme-stroke-width)) var(--ui-control-stroke-style,solid) var(--ui-control-stroke-color,var(--control-border))!important;
+  /* Draw the entire theme stroke inside the shared 32px control box. */
+  outline-offset:var(--ui-control-stroke-offset,calc(var(--ui-control-stroke-width,var(--ui-control-theme-stroke-width)) * -1))!important;
+}
+:root :is(.btn.primary,.btn.newbtn,input[type="submit"],.seg-btn.active) {
+  --ui-control-stroke-width:var(--ui-primary-stroke-width);
+}
+:root .btn.ghost { --ui-control-stroke-style:dashed; }
+:root :is(.xbtn,.p-dialog-close,.p-collapse,.p-settings-trigger,.ui-select-option,.personalization-segmented-option,.p-choice > span,.user-message) {
+  --ui-control-stroke-width:0px;
+}
+:root :is(.xbtn,.p-dialog-close,.p-collapse,.user-message) {
+  width:var(--ui-control-height)!important;
+  min-width:var(--ui-control-height)!important;
+  padding-inline:0!important;
+}
+:root :is(button,input,select):hover,
+:root .ui-select-enhanced.is-open .ui-select-trigger {
+  --ui-control-stroke-color:var(--control-hover-border);
+}
+html[data-p-theme="brutalist"] .p-settings-trigger:hover:not(:focus-visible) {
+  --ui-control-stroke-width:var(--brutal-border-width);
+  --ui-control-stroke-color:var(--brutal-ink);
+}
+html[data-p-theme="brutalist"][data-p-resolved="dark"] :is(input,select,.ui-select-trigger):not(:hover):not(:focus-visible) {
+  --ui-control-stroke-color:var(--text);
+}
+html[data-p-theme="brutalist"][data-p-resolved="dark"] .ui-select-enhanced.is-open .ui-select-trigger:not(:focus-visible) {
+  --ui-control-stroke-color:var(--control-hover-border);
+}
+:root :is(button,input,select):disabled {
+  --ui-control-stroke-color:var(--control-border);
+}
+/* Keyboard focus uses a separated ring without changing layout. */
+:root :is(button,input,select,.user-message):focus-visible,
+:root .p-choice input:focus-visible + span {
+  --ui-control-stroke-width:max(2px,var(--ui-control-theme-stroke-width));
+  --ui-control-stroke-color:var(--text);
+  --ui-control-stroke-style:solid;
+  --ui-control-stroke-offset:2px;
+}
+/* Text fields keep their inset stroke when typing, matching select controls. */
+:root :is(input:not([type]),input[type="text"],input[type="search"]):focus {
+  --ui-control-stroke-width:var(--ui-control-theme-stroke-width);
+  --ui-control-stroke-color:var(--control-hover-border);
+  --ui-control-stroke-style:solid;
+  --ui-control-stroke-offset:calc(var(--ui-control-theme-stroke-width) * -1);
+}
+html[data-p-theme="neumorphism"] :is(input:not([type]),input[type="text"],input[type="search"],select,.ui-select-trigger):is(:hover,:focus):not(:disabled),
+html[data-p-theme="neumorphism"] .ui-select-enhanced.is-open .ui-select-trigger {
+  --ui-control-stroke-width:1px;
+  --ui-control-stroke-color:var(--control-hover-border);
+  --ui-control-stroke-offset:-1px;
+}
