@@ -660,7 +660,7 @@ select option:checked { background:var(--select-option-selected-bg); color:var(-
   display:block; margin-top:0; padding:0; overflow:visible;
 }
 .main-shell:has(#page-bot-platform.active) .page-context-switcher .bot-bar { margin-top:0; }
-.main-shell:has(#page-bot-platform.active) .page-context-switcher .inner-tabs { margin-top:8px; }
+.main-shell:has(#page-bot-platform.active) .page-context-switcher .inner-tabs { margin-top:0; }
 .main-shell:has(#page-bot-platform.active) > .bot-header-zone:first-child .topbar { margin-bottom:0; }
 .main-shell:has(#page-bot-platform.active) .page-context-switcher .bot-bar {
   background:transparent; border:0; box-shadow:none; padding:0!important; margin-bottom:16px;
