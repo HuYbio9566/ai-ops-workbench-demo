@@ -141,8 +141,7 @@ html[data-p-theme="default"][data-p-resolved="light"] .main-shell:has(#page-lega
 html[data-p-theme="default"][data-p-resolved="light"] #page-legacy-feedback > .legacy-card,
 html[data-p-theme="default"][data-p-resolved="light"] #page-legacy-knowledge > .legacy-card,
 html[data-p-theme="default"][data-p-resolved="light"] #page-legacy-tuitui > .legacy-card { background:transparent!important; }
-html[data-p-theme="default"][data-p-resolved="light"] body:has(#page-legacy-feedback.active) .col-main { background:var(--content-bg)!important; }
-html[data-p-theme="default"][data-p-resolved="light"][data-p-style="embedded"] body:has(#page-legacy-feedback.active) .col-main { background:var(--content-bg)!important; }
+html[data-p-theme="default"][data-p-resolved="light"][data-p-style="embedded"] body:has(#page-legacy-feedback.active) .col-main { background:var(--bg)!important; }
 html[data-p-theme="default"] #page-bot-platform #itab-bot-overview > .card,
 html[data-p-theme="default"] #page-bot-platform #itab-bot-overview > .grid > .card {
   background:var(--overview-card-bg);

@@ -174,7 +174,6 @@ select option:checked { background:var(--select-option-selected-bg); color:var(-
 .main-shell:has(#page-legacy-overview.active) { display:flex; flex-direction:column; }
 .main-shell:has(#page-legacy-overview.active),
 #page-legacy-overview > .legacy-card { background:var(--surface)!important; }
-body:has(#page-legacy-feedback.active) .col-main { background:var(--content-bg)!important; }
 .main-shell:has(#page-legacy-overview.active) > .topbar { flex-shrink:0; }
 #page-legacy-overview.active { display:flex; flex:1; min-height:320px; }
 #page-legacy-overview > .legacy-card { flex:1; display:flex; align-items:center; justify-content:center; padding:24px; }
