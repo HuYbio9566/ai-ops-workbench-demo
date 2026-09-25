@@ -668,7 +668,7 @@ select option:checked { background:var(--select-option-selected-bg); color:var(-
 .main-shell:has(#page-bot-platform.active) .page-context-switcher .bot-tabs {
   display:flex; height:40px; gap:4px; flex-wrap:nowrap; overflow-x:auto; overflow-y:hidden;
   scrollbar-width:none; border-bottom:0; background:var(--surface-soft);
-  margin-top:8px; margin-bottom:-8px;
+  margin-top:8px; margin-bottom:-16px;
 }
 .main-shell:has(#page-bot-platform.active) .page-context-switcher .bot-tabs::-webkit-scrollbar { width:0; height:0; }
 .main-shell:has(#page-bot-platform.active) .page-context-switcher .bot-tab {
