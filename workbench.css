@@ -580,6 +580,7 @@ select option:checked { background:var(--select-option-selected-bg); color:var(-
 #page-bot-platform #itab-bot-overview.active { display:grid; gap:20px; }
 #page-bot-platform #itab-bot-overview > .card,
 #page-bot-platform #itab-bot-overview > .grid > .card { margin:0; }
+#page-bot-platform #itab-bot-overview.active > .card:first-child { margin-top:16px; }
 @media (max-width:900px) {
   #page-bot-platform .digital-human-grid { grid-template-columns:1fr; }
   #page-bot-platform .overview-kpi-item { padding:8px 0; }
