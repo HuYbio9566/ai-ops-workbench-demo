@@ -27,8 +27,9 @@
       dark: palette('#151515','#1c1c1c','#262626','#ededed','#a3a3a3','#ff00ff','#090014','#343434','0px','0px','0 2px 12px rgba(0,0,0,.22)','mono') }
   };
   const defaults = Object.freeze({ version: 1, theme: 'default', mode: 'light', position: 'left', style: 'embedded', nav: 'wide', font: 'theme' });
-  const choices = { theme: Object.keys(themes), mode: ['light','dark','system'], position: ['left','top'], style: ['standard','embedded','floating'], nav: ['wide','icons','labels'], font: ['theme','sans','serif','mono'] };
-  const key = 'ai-ops:public-demo:personalization:v2';
+  // 保留原工作台样式与导航折叠，只开放明暗切换；独立存储不覆盖旧版偏好。
+  const choices = { theme: ['default'], mode: ['light','dark'], position: ['left'], style: ['embedded'], nav: ['wide','icons'], font: ['theme'] };
+  const key = 'ai-ops:dark-mode-toggle:v1';
   const media = matchMedia('(prefers-color-scheme: dark)');
   const fonts = { sans: '-apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif', serif: 'Georgia, "Songti SC", "STSong", serif', mono: '"SFMono-Regular", Consolas, "PingFang SC", monospace', neo: '"Space Grotesk", -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif' };
   function normalize(input) {
