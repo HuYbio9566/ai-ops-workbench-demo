@@ -6,7 +6,7 @@
     default: { label: '默认', hint: '清晰 · 活力蓝',
       // 默认浅色主题：内容底与卡片底交换层级，统一作用于共享组件。
       light: palette('#fafafa','#f1f5f9','#ffffff','#0f172a','#64748b','#0052ff','#ffffff','#e2e8f0','12px','16px','0 4px 14px rgba(0,82,255,.08)'),
-      dark: palette('#151515','#1c1c1c','#262626','#ededed','#a3a3a3','#0052ff','#ffffff','#343434','12px','16px','0 2px 12px rgba(0,0,0,.22)') },
+      dark: palette('hsl(210 7% 11%)','#272B33','hsl(219 13% 26%)','hsl(0 0% 88%)','hsl(0 0% 75%)','hsl(213 100% 57%)','#ffffff','hsl(219 9% 31%)','12px','16px','0 2px 12px rgba(0,0,0,.22)') },
     saas: { label: 'Vercel', hint: '中性 · 专注数据',
       light: palette('#fafafa','#ffffff','#f2f2f2','#171717','#666666','#171717','#ffffff','#e5e5e5','6px','8px','0 1px 2px rgba(0,0,0,.04)'),
       dark: palette('#151515','#1c1c1c','#262626','#ededed','#a3a3a3','#f5f5f5','#171717','#343434','6px','8px','0 2px 12px rgba(0,0,0,.22)') },

@@ -95,13 +95,41 @@ html[data-p-theme="default"][data-p-resolved="light"] {
   --table-header-bg:var(--p-surface);
 }
 html[data-p-theme="default"][data-p-resolved="dark"] {
-  --blue-soft:color-mix(in srgb,var(--p-primary) 18%,var(--surface));
-  --content-bg:var(--surface);
-  --overview-card-bg:var(--bg);
+  /* 参考销售管理驾驶舱的暗黑语义色：深画布、蓝灰卡片与亮蓝交互。 */
+  --faint:hsl(0 0% 65%);
+  --border-strong:hsl(219 8% 38%);
+  --blue-deep:hsl(213 100% 65%);
+  --blue-soft:hsl(223 100% 15%);
+  --nav-active-bg:hsl(213 100% 57% / .12);
+  --surface-hover:var(--surface-soft);
+  --nav-hover:var(--surface-soft);
+  --content-bg:var(--bg);
+  --p-dialog-bg:var(--surface);
+  --control-bg:var(--surface);
+  --select-menu-bg:var(--surface);
+  --select-option-hover-bg:var(--blue-soft);
+  --overview-card-bg:var(--surface);
   --overview-card-border-width:0px;
+  --overview-item-hover:var(--surface-hover);
+  --overview-tab-bg:var(--surface);
+  --overview-tab-active-text:var(--blue);
   --module-item-bg:var(--overview-card-bg);
-  --table-header-bg:var(--content-bg);
+  --table-header-bg:var(--surface-soft);
   --table-row-hover-bg:var(--surface-hover);
+  --green:hsl(97.9817 58.9189% 63.7255%);
+  --bad:hsl(356 100% 70%);
+  --amber:hsl(30.2041 100% 71.1765%);
+  --success-soft:hsl(135 18% 20%);
+  --warning-soft:hsl(28 20% 21%);
+  --chart-1:hsl(211.0714 100% 67.0588%);
+  --chart-2:var(--green);
+  --chart-3:var(--amber);
+  --chart-4:hsl(253.5294 98.0769% 79.6078%);
+  --chart-5:hsl(158 47.8723% 63.1373%);
+  --chart-6:hsl(186.7133 74.0933% 62.1569%);
+}
+html[data-p-theme="default"][data-p-resolved="dark"] :is(.col-left,.p-navigation,.col-main) {
+  background:var(--surface);
 }
 html[data-p-theme="default"][data-p-resolved="dark"] .main-shell {
   background:var(--content-bg)!important;
@@ -110,7 +138,7 @@ html[data-p-theme="default"][data-p-resolved="light"] :is(.col-left,.p-navigatio
 html[data-p-theme="default"][data-p-resolved="light"] .col-main { background:var(--surface-soft)!important; }
 html[data-p-theme="default"][data-p-resolved="light"] :is(.modal,.modal .m-head,.p-dialog) { background:var(--surface-soft); }
 html[data-p-theme="default"][data-p-resolved="light"] .main-shell { background:var(--content-bg)!important; }
-html[data-p-theme="default"][data-p-resolved="light"] .main-shell:has(#page-legacy-overview.active) { background:var(--content-bg)!important; }
+html[data-p-theme="default"] .main-shell:has(#page-legacy-overview.active) { background:var(--content-bg)!important; }
 html[data-p-theme="default"][data-p-resolved="light"][data-p-style="embedded"] :is(.col-left,.p-navigation) { background:var(--surface-soft)!important; }
 html[data-p-theme="default"][data-p-resolved="light"][data-p-style="floating"] .p-navigation { background:var(--content-bg)!important; }
 html[data-p-theme="default"][data-p-resolved="light"] #page-legacy-skillhub > .legacy-card { background:transparent!important; }
@@ -135,7 +163,7 @@ html[data-p-theme="default"][data-p-resolved="dark"] #page-legacy-org > .card {
 html[data-p-theme] .main-shell:has(#page-legacy-org.active) {
   background:var(--surface)!important;
 }
-html[data-p-theme="default"][data-p-resolved="light"] .main-shell:has(#page-legacy-org.active) {
+html[data-p-theme="default"] .main-shell:has(#page-legacy-org.active) {
   background:var(--content-bg)!important;
 }
 html[data-p-theme="default"][data-p-resolved="light"] #page-legacy-feedback > .legacy-card,
